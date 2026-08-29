@@ -655,7 +655,7 @@ function initNotificationForm() {
       statusEl.textContent = '⏳ Sending notification to all subscribers...';
     }
 
-    let success = false;
+    let serverMessage = '';
 
     // 1. Send via Google Apps Script backend (avoids CORS + exposes no secret keys)
     if (CONFIG.APPS_SCRIPT_URL) {
@@ -669,9 +669,13 @@ function initNotificationForm() {
         const resJson = await res.json();
         if (resJson.status === 'success') {
           success = true;
+          serverMessage = resJson.message || 'Notification broadcasted successfully to all subscribers!';
+        } else {
+          serverMessage = resJson.message || 'Unable to broadcast push notification.';
         }
       } catch(err) {
-        console.log('Notification via GAS failed, attempting direct fallback:', err);
+        console.log('Notification via GAS failed:', err);
+        serverMessage = err.toString();
       }
     }
 
@@ -712,10 +716,10 @@ function initNotificationForm() {
     submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Broadcast to All Subscribers';
 
     if (statusEl) {
-      statusEl.style.color = '#2ecc71';
+      statusEl.style.color = success ? '#2ecc71' : '#f39c12';
       statusEl.textContent = success
-        ? `✅ Notification broadcasted successfully to all subscribers!\n\nTitle: "${title}"\nMessage: "${message}"`
-        : `⚠️ Local preview sent. To broadcast to all subscribers, configure the OneSignal REST API key in your Google Apps Script.`;
+        ? `✅ ${serverMessage}\n\nTitle: "${title}"\nMessage: "${message}"`
+        : `⚠️ ${serverMessage}\n\nLocal preview was displayed on this device.`;
     }
 
     form.reset();
