@@ -444,13 +444,15 @@
       <!-- SECTION 5: PUSH NOTIFICATIONS -->
       <section id="notifications" class="admin-section" style="display:none;">
         <div class="table-card" style="max-width:650px;">
-          <div class="table-header">
+          <div class="table-header" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
             <h2>Send Broadcast Push Notification</h2>
+            <span id="subscriber-count-badge" class="badge" style="background:rgba(46,204,113,0.15); color:#2ecc71; border:1px solid rgba(46,204,113,0.4); padding:6px 12px; font-weight:700; font-size:0.85rem;">
+              <i class="fas fa-mobile-alt"></i> Reachable Devices: <strong id="active-subscriber-count">Fetching...</strong>
+            </span>
           </div>
           <p style="color:var(--text-muted); font-size:0.85rem; margin-bottom:20px;">
             <i class="fas fa-info-circle" style="color:var(--gold-primary);"></i>
-            This broadcasts to all customers who have subscribed to push notifications on the website.
-            A local preview will also appear on this device.
+            This broadcasts live push notifications to all subscribed mobile phones &amp; computers.
           </p>
           <form id="admin-notify-form">
             <div class="form-group">

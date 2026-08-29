@@ -613,11 +613,29 @@ function initNotificationForm() {
   const form = document.getElementById('admin-notify-form');
   if (!form) return;
 
-  // Show current subscription count if available
-  if (CONFIG.ONESIGNAL_APP_ID) {
-    const statusEl = document.getElementById('notify-subscriber-count');
-    if (statusEl) statusEl.textContent = 'Loading subscribers...';
+  async function fetchLiveSubscriberCount() {
+    const countEl = document.getElementById('active-subscriber-count');
+    if (!countEl || !CONFIG.APPS_SCRIPT_URL) return;
+
+    try {
+      const payload = encodeURIComponent(JSON.stringify({
+        onesignal_app_id: CONFIG.ONESIGNAL_APP_ID || '91a28970-9e1b-4343-a379-de2a1923e7a7'
+      }));
+      const res = await fetch(`${CONFIG.APPS_SCRIPT_URL}?action=getSubscriberCount&data=${payload}&_t=${Date.now()}`, { cache: 'no-store' });
+      const resJson = await res.json();
+
+      if (resJson.status === 'success' && typeof resJson.subscribers !== 'undefined') {
+        const count = resJson.subscribers;
+        countEl.textContent = `${count} Device${count === 1 ? '' : 's'}`;
+      } else {
+        countEl.textContent = 'Key Setup Pending';
+      }
+    } catch(err) {
+      countEl.textContent = 'Active Subscribers';
+    }
   }
+
+  fetchLiveSubscriberCount();
 
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
