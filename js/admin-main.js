@@ -160,6 +160,13 @@ function initAdminDashboard() {
   initBulkCSVImport();
   initNotificationForm();
   initNavigationTabs();
+
+  // Background Auto-Refresh every 15 seconds for live enquiries, appointments & visitor count
+  setInterval(() => {
+    renderOverviewStats();
+    renderEnquiriesTable();
+    renderAppointmentsTable();
+  }, 15000);
 }
 
 function initNavigationTabs() {
@@ -202,7 +209,7 @@ function renderOverviewStats() {
   if (goldSubEl) goldSubEl.textContent = `24K Rate: ₹${rates.gold_24k.toLocaleString('en-IN')}/g`;
 
   const enquiries = JSON.parse(localStorage.getItem('rnj_submitEnquiry')) || [];
-  if (enquiriesCountEl) enquiriesCountEl.textContent = enquiries.length || 1;
+  if (enquiriesCountEl) enquiriesCountEl.textContent = enquiries.length;
 
   if (CONFIG.APPS_SCRIPT_URL && visitorCountEl) {
     fetch(`${CONFIG.APPS_SCRIPT_URL}?action=exportAnalytics`)
@@ -210,10 +217,12 @@ function renderOverviewStats() {
       .then(res => {
         if (res.status === 'success' && Array.isArray(res.data) && res.data.length > 0) {
           const totalVisits = res.data.length;
-          const todayStr = new Date().toISOString().split('T')[0];
+          const today = new Date();
           const todayVisits = res.data.filter(v => {
             const timeStr = String(v.timestamp || Object.values(v)[0] || '');
-            return timeStr.startsWith(todayStr);
+            if (!timeStr) return false;
+            const vDate = new Date(timeStr);
+            return !isNaN(vDate.getTime()) && vDate.toDateString() === today.toDateString();
           }).length;
 
           visitorCountEl.textContent = totalVisits;
@@ -356,18 +365,42 @@ function renderEnquiriesTable() {
   const tbody = document.getElementById('admin-enquiries-tbody');
   if (!tbody) return;
 
-  const enquiries = JSON.parse(localStorage.getItem('rnj_submitEnquiry')) || [
-    { id: 'ENQ_101', name: 'Sanjay Sharma', phone: '8708853335', product_name: 'Royal Heritage 22K Gold Ruby Ring', message: 'Looking to buy for upcoming wedding.', timestamp: new Date().toISOString() }
-  ];
+  if (CONFIG.APPS_SCRIPT_URL) {
+    fetch(`${CONFIG.APPS_SCRIPT_URL}?action=exportEnquiries`)
+      .then(res => res.json())
+      .then(res => {
+        if (res.status === 'success' && Array.isArray(res.data) && res.data.length > 0) {
+          localStorage.setItem('rnj_submitEnquiry', JSON.stringify(res.data));
+          displayEnquiriesRows(res.data);
+          const enquiriesCountEl = document.getElementById('stat-enquiries-count');
+          if (enquiriesCountEl) enquiriesCountEl.textContent = res.data.length;
+        } else {
+          displayEnquiriesRows(JSON.parse(localStorage.getItem('rnj_submitEnquiry')) || []);
+        }
+      })
+      .catch(() => displayEnquiriesRows(JSON.parse(localStorage.getItem('rnj_submitEnquiry')) || []));
+  } else {
+    displayEnquiriesRows(JSON.parse(localStorage.getItem('rnj_submitEnquiry')) || []);
+  }
+}
+
+function displayEnquiriesRows(enquiries) {
+  const tbody = document.getElementById('admin-enquiries-tbody');
+  if (!tbody) return;
+
+  if (!enquiries || enquiries.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--text-muted); padding:30px;">No customer enquiries received yet.</td></tr>`;
+    return;
+  }
 
   tbody.innerHTML = enquiries.map(e => `
     <tr>
-      <td>${new Date(e.timestamp).toLocaleDateString()}</td>
+      <td>${e.timestamp ? new Date(e.timestamp).toLocaleDateString('en-IN', { day:'2-digit', month:'short', year:'numeric' }) : 'N/A'}</td>
       <td><strong>${escapeHtml(e.name)}</strong><br><span style="color:var(--text-muted); font-size:0.8rem;">${escapeHtml(e.phone)}</span></td>
       <td>${escapeHtml(e.product_name || 'General')}</td>
       <td>${escapeHtml(e.message)}</td>
       <td>
-        <a href="https://wa.me/${escapeHtml(e.phone)}?text=${encodeURIComponent('Hello ' + (e.name||'') + ', thank you for contacting RN Jewellers regarding ' + (e.product_name||'jewellery') + '. How can we assist you?')}" target="_blank" class="btn btn-whatsapp btn-sm" style="padding:4px 8px; font-size:0.75rem;"><i class="fab fa-whatsapp"></i> Reply</a>
+        <a href="https://wa.me/${escapeHtml(String(e.phone || '').replace(/[^0-9]/g, ''))}?text=${encodeURIComponent('Hello ' + (e.name||'') + ', thank you for contacting RN Jewellers regarding ' + (e.product_name||'jewellery') + '. How can we assist you?')}" target="_blank" class="btn btn-whatsapp btn-sm" style="padding:4px 8px; font-size:0.75rem;"><i class="fab fa-whatsapp"></i> Reply</a>
       </td>
     </tr>
   `).join('');
