@@ -175,8 +175,27 @@ const API = {
     }
 
     const rawMetalCost = (parseFloat(product.weight_g) || 0) * metalRate;
-    const making = parseFloat(product.making_charge) || 0;
-    const grossPrice = rawMetalCost + making;
+    
+    // Making charge calculation (percentage % vs fixed ₹)
+    const makingType = product.making_type || 'percentage';
+    const makingVal = parseFloat(product.making_charge) || 0;
+    const isFreeMaking = product.is_no_making_charge === true || String(product.is_no_making_charge).toLowerCase() === 'true' || makingVal === 0;
+
+    let makingAmount = 0;
+    let makingText = '0%';
+
+    if (isFreeMaking) {
+      makingAmount = 0;
+      makingText = '0% (FREE)';
+    } else if (makingType === 'percentage' || makingVal <= 50) { // Values <= 50 are treated as percentage
+      makingAmount = (rawMetalCost * makingVal) / 100;
+      makingText = `${makingVal}%`;
+    } else {
+      makingAmount = makingVal;
+      makingText = `₹${makingVal.toLocaleString('en-IN')}`;
+    }
+
+    const grossPrice = rawMetalCost + makingAmount;
 
     // Determine Discount % (Product override > Category discount > 0)
     let discountPct = parseFloat(product.product_discount) || 0;
@@ -193,7 +212,11 @@ const API = {
       calculated: {
         metal_rate: metalRate,
         raw_metal_cost: Math.round(rawMetalCost),
-        making_charge: making,
+        making_type: makingType,
+        making_val: makingVal,
+        making_amount: Math.round(makingAmount),
+        making_text: makingText,
+        is_free_making: isFreeMaking,
         gross_price: Math.round(grossPrice),
         discount_percent: discountPct,
         discount_amount: Math.round(discountAmount),

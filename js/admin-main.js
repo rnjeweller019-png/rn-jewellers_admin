@@ -262,15 +262,20 @@ function renderAdminProductsTable() {
     if (img.startsWith('../')) {
       img = img.replace('../', '');
     }
+    const makingBadge = p.calculated.is_free_making ? '<span style="color:#2ecc71; font-weight:bold;">0% (FREE)</span>' : escapeHtml(p.calculated.making_text);
+
     return `
     <tr>
-      <td><img src="${escapeHtml(img)}" class="table-img" alt="${escapeHtml(p.name)}"></td>
+      <td><img src="${escapeHtml(img)}" class="table-img" alt="${escapeHtml(p.name)}" onerror="this.onerror=null; this.src='assets/logo.png';"></td>
       <td>
         <strong>${escapeHtml(p.name)}</strong><br>
         <span style="font-size:0.75rem; color:var(--text-muted);">${escapeHtml(p.id)}</span>
       </td>
       <td>${escapeHtml(p.category)}</td>
-      <td>${escapeHtml(String(p.weight_g))}g (${escapeHtml(p.purity)})</td>
+      <td>
+        ${escapeHtml(String(p.weight_g))}g (${escapeHtml(p.purity)})<br>
+        <span style="font-size:0.75rem; color:var(--text-muted);">Making: ${makingBadge}</span>
+      </td>
       <td><strong style="color:var(--gold-light);">₹${p.calculated.final_price.toLocaleString('en-IN')}</strong></td>
       <td>
         <button onclick="editProduct('${escapeHtml(p.id)}')" class="btn btn-secondary btn-sm" style="padding:4px 8px; font-size:0.75rem;"><i class="fas fa-edit"></i> Edit</button>
@@ -300,12 +305,14 @@ function initProductForm() {
       metal: document.getElementById('admin-p-metal').value,
       purity: document.getElementById('admin-p-purity').value,
       weight_g: parseFloat(document.getElementById('admin-p-weight').value) || 0,
+      making_type: document.getElementById('admin-p-making-type').value,
       making_charge: parseFloat(document.getElementById('admin-p-making').value) || 0,
       product_discount: parseFloat(document.getElementById('admin-p-discount').value) || 0,
       description: document.getElementById('admin-p-desc').value,
       image_urls: [imgVal],
       is_featured: document.getElementById('admin-p-featured').checked,
-      is_new_arrival: document.getElementById('admin-p-new').checked
+      is_new_arrival: document.getElementById('admin-p-new').checked,
+      is_no_making_charge: document.getElementById('admin-p-no-making') ? document.getElementById('admin-p-no-making').checked : false
     };
 
     API.saveProduct(productData);
@@ -327,12 +334,18 @@ function editProduct(id) {
   document.getElementById('admin-p-metal').value = product.metal;
   document.getElementById('admin-p-purity').value = product.purity;
   document.getElementById('admin-p-weight').value = product.weight_g;
-  document.getElementById('admin-p-making').value = product.making_charge;
+  if (document.getElementById('admin-p-making-type')) {
+    document.getElementById('admin-p-making-type').value = product.making_type || 'percentage';
+  }
+  document.getElementById('admin-p-making').value = product.making_charge || 0;
   document.getElementById('admin-p-discount').value = product.product_discount || 0;
   document.getElementById('admin-p-desc').value = product.description;
   document.getElementById('admin-p-image').value = product.image_urls[0] || '';
   document.getElementById('admin-p-featured').checked = product.is_featured;
   document.getElementById('admin-p-new').checked = product.is_new_arrival;
+  if (document.getElementById('admin-p-no-making')) {
+    document.getElementById('admin-p-no-making').checked = product.is_no_making_charge === true || String(product.is_no_making_charge).toLowerCase() === 'true' || product.making_charge === 0;
+  }
 
   window.scrollTo({ top: document.getElementById('product-form-card').offsetTop - 100, behavior: 'smooth' });
 }
