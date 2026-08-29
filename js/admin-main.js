@@ -227,7 +227,17 @@ function renderOverviewStats() {
 
           visitorCountEl.textContent = totalVisits;
           if (todaySubEl) {
-            todaySubEl.innerHTML = `<i class="fas fa-circle" style="font-size:0.55rem; color:#2ecc71; margin-right:3px;"></i> ${todayVisits} Visitors Today`;
+            const tzMap = {};
+            res.data.forEach(v => {
+              const tz = v.timezone || Object.values(v)[4] || 'Asia/Kolkata';
+              if (tz && typeof tz === 'string') {
+                tzMap[tz] = (tzMap[tz] || 0) + 1;
+              }
+            });
+            const topTz = Object.keys(tzMap).sort((a,b) => tzMap[b] - tzMap[a])[0] || 'Asia/Kolkata';
+            const cleanTz = topTz.replace('_', ' ');
+
+            todaySubEl.innerHTML = `<i class="fas fa-globe" style="color:var(--gold-primary); margin-right:4px;"></i> ${todayVisits} Today • Top Region: <strong>${escapeHtml(cleanTz)}</strong>`;
           }
         }
       })
