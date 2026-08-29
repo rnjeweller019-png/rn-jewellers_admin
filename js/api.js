@@ -90,6 +90,40 @@ const API = {
     }
   },
 
+  // Smart Timestamp-based Sync (Checks if server timestamp is newer before pulling full catalog)
+  async checkAndSyncServer() {
+    if (!CONFIG.APPS_SCRIPT_URL) return false;
+
+    try {
+      const res = await fetch(`${CONFIG.APPS_SCRIPT_URL}?action=getSettings`);
+      const setJson = await res.json();
+
+      if (setJson.status === 'success' && setJson.data) {
+        const serverLastUpdated = setJson.data.last_rate_update || setJson.data.last_updated || '';
+        const currentRates = this.getRates();
+        const clientLastUpdated = currentRates.last_updated || '';
+
+        const newRates = {
+          gold_22k: parseFloat(setJson.data.gold_22k_rate) || currentRates.gold_22k,
+          gold_24k: parseFloat(setJson.data.gold_24k_rate) || currentRates.gold_24k,
+          silver: parseFloat(setJson.data.silver_rate) || currentRates.silver,
+          last_updated: serverLastUpdated || new Date().toISOString()
+        };
+
+        const hasProductCache = !!localStorage.getItem('rnj_products');
+
+        if (!hasProductCache || !clientLastUpdated || serverLastUpdated !== clientLastUpdated) {
+          localStorage.setItem('rnj_rates', JSON.stringify(newRates));
+          await this.syncWithServer();
+          return true; // Data updated
+        }
+      }
+    } catch (err) {
+      console.log('Smart sync check error:', err);
+    }
+    return false;
+  },
+
   // Get All Products (from LocalStorage or Sample Products)
   getProducts() {
     const stored = localStorage.getItem('rnj_products');
