@@ -4,7 +4,7 @@
 
 const CONFIG = {
   // Replace this with your Google Apps Script Web App URL after deployment
-  APPS_SCRIPT_URL: "https://script.google.com/macros/s/AKfycbzA3Ct_IjromzHv6U8I9brZa6E80GOL6HIhDkwIctgILqQhi0fYu_vjxCQM7ZfhamUT/exec",
+  APPS_SCRIPT_URL: "https://script.google.com/macros/s/AKfycbwIejswb3_YV-5HeYPTrIOL1keBzHbWznSNwXYvM74CI2ishbLflTADD0lv43Z9vwOY/exec",
   
   // OneSignal App ID for Push Notifications (Optional)
   ONESIGNAL_APP_ID: "91a28970-9e1b-4343-a379-de2a1923e7a7",
