@@ -628,10 +628,10 @@ function initNotificationForm() {
         const count = resJson.subscribers;
         countEl.textContent = `${count} Device${count === 1 ? '' : 's'}`;
       } else {
-        countEl.textContent = 'Key Setup Pending';
+        countEl.textContent = '0 Devices';
       }
     } catch(err) {
-      countEl.textContent = 'Active Subscribers';
+      countEl.textContent = '0 Devices';
     }
   }
 
