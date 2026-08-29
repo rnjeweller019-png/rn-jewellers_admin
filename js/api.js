@@ -62,8 +62,8 @@ const API = {
                 making_charge: parseFloat(p.making_charge) || 0,
                 product_discount: parseFloat(p.product_discount) || 0,
                 image_urls: imgs,
-                is_featured: p.is_featured === true || p.is_featured === 'true',
-                is_new_arrival: p.is_new_arrival === true || p.is_new_arrival === 'true'
+                is_featured: p.is_featured === true || String(p.is_featured).toLowerCase() === 'true' || p.is_featured === 1 || p.is_featured === '1',
+                is_new_arrival: p.is_new_arrival === true || String(p.is_new_arrival).toLowerCase() === 'true' || p.is_new_arrival === 1 || p.is_new_arrival === '1'
               };
             });
             localStorage.setItem('rnj_products', JSON.stringify(cleanProducts));
