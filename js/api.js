@@ -47,7 +47,7 @@ const API = {
       const prodPromise = fetch(`${CONFIG.APPS_SCRIPT_URL}?action=getProducts`)
         .then(res => res.json())
         .then(prodJson => {
-          if (prodJson.status === 'success' && Array.isArray(prodJson.data) && prodJson.data.length > 0) {
+          if (prodJson.status === 'success' && Array.isArray(prodJson.data)) {
             const cleanProducts = prodJson.data.map(p => {
               let imgs = [];
               if (typeof p.image_urls === 'string' && p.image_urls.trim() !== '') {
@@ -111,7 +111,7 @@ const API = {
           last_updated: serverLastUpdated || new Date().toISOString()
         };
 
-        const hasProductCache = !!localStorage.getItem('rnj_products');
+        const hasProductCache = localStorage.getItem('rnj_products') !== null;
 
         if (!hasProductCache || !clientLastUpdated || serverLastUpdated !== clientLastUpdated) {
           localStorage.setItem('rnj_rates', JSON.stringify(newRates));
@@ -128,14 +128,19 @@ const API = {
   // Get All Products (from LocalStorage or Sample Products)
   getProducts() {
     const stored = localStorage.getItem('rnj_products');
-    let products = CONFIG.SAMPLE_PRODUCTS;
-    if (stored) {
+    let products = [];
+    if (stored !== null) {
       try {
         const parsed = JSON.parse(stored);
-        if (Array.isArray(parsed) && parsed.length > 0) {
+        if (Array.isArray(parsed)) {
           products = parsed;
         }
-      } catch(e) {}
+      } catch(e) {
+        products = CONFIG.SAMPLE_PRODUCTS;
+      }
+    } else {
+      products = CONFIG.SAMPLE_PRODUCTS;
+      localStorage.setItem('rnj_products', JSON.stringify(products));
     }
     
     const rates = this.getRates();
