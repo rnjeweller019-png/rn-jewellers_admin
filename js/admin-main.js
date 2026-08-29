@@ -177,7 +177,7 @@ function initNavigationTabs() {
     link.addEventListener('click', (e) => {
       e.preventDefault();
       const targetId = link.getAttribute('href').substring(1);
-      
+
       links.forEach(l => l.parentElement.classList.remove('active'));
       link.parentElement.classList.add('active');
 
@@ -196,7 +196,7 @@ function initNavigationTabs() {
 function renderOverviewStats() {
   const products = API.getProducts();
   const rates = API.getRates();
-  
+
   const totalProductsEl = document.getElementById('stat-total-products');
   const goldRateEl = document.getElementById('stat-gold-rate');
   const goldSubEl = document.getElementById('stat-sub-gold');
@@ -234,14 +234,14 @@ function renderOverviewStats() {
                 tzMap[tz] = (tzMap[tz] || 0) + 1;
               }
             });
-            const topTz = Object.keys(tzMap).sort((a,b) => tzMap[b] - tzMap[a])[0] || 'Asia/Kolkata';
+            const topTz = Object.keys(tzMap).sort((a, b) => tzMap[b] - tzMap[a])[0] || 'Asia/Kolkata';
             const cleanTz = topTz.replace('_', ' ');
 
             todaySubEl.innerHTML = `<i class="fas fa-globe" style="color:var(--gold-primary); margin-right:4px;"></i> ${todayVisits} Today • Top Region: <strong>${escapeHtml(cleanTz)}</strong>`;
           }
         }
       })
-      .catch(() => {});
+      .catch(() => { });
   }
 }
 
@@ -364,7 +364,7 @@ function initProductForm() {
     preview.innerHTML = `📐 <b>${makingVal}%</b> ${basisLabel} &nbsp;→&nbsp; <b>₹${effectiveCost.toLocaleString('en-IN')}</b> × ${makingVal}% = <b>Making: ₹${makingAmt.toLocaleString('en-IN')}</b>`;
   }
 
-  ['admin-p-weight','admin-p-making','admin-p-making-type','admin-p-making-basis'].forEach(id => {
+  ['admin-p-weight', 'admin-p-making', 'admin-p-making-type', 'admin-p-making-basis'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.addEventListener('input', updateMakingPreview);
     if (el) el.addEventListener('change', updateMakingPreview);
@@ -549,12 +549,12 @@ function displayEnquiriesRows(enquiries) {
 
   tbody.innerHTML = enquiries.map(e => `
     <tr>
-      <td>${e.timestamp ? new Date(e.timestamp).toLocaleDateString('en-IN', { day:'2-digit', month:'short', year:'numeric' }) : 'N/A'}</td>
+      <td>${e.timestamp ? new Date(e.timestamp).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : 'N/A'}</td>
       <td><strong>${escapeHtml(e.name)}</strong><br><span style="color:var(--text-muted); font-size:0.8rem;">${escapeHtml(e.phone)}</span></td>
       <td>${escapeHtml(e.product_name || 'General')}</td>
       <td>${escapeHtml(e.message)}</td>
       <td>
-        <a href="https://wa.me/${escapeHtml(String(e.phone || '').replace(/[^0-9]/g, ''))}?text=${encodeURIComponent('Hello ' + (e.name||'') + ', thank you for contacting RN Jewellers regarding ' + (e.product_name||'jewellery') + '. How can we assist you?')}" target="_blank" class="btn btn-whatsapp btn-sm" style="padding:4px 8px; font-size:0.75rem;"><i class="fab fa-whatsapp"></i> Reply</a>
+        <a href="https://wa.me/${escapeHtml(String(e.phone || '').replace(/[^0-9]/g, ''))}?text=${encodeURIComponent('Hello ' + (e.name || '') + ', thank you for contacting RN Jewellers regarding ' + (e.product_name || 'jewellery') + '. How can we assist you?')}" target="_blank" class="btn btn-whatsapp btn-sm" style="padding:4px 8px; font-size:0.75rem;"><i class="fab fa-whatsapp"></i> Reply</a>
       </td>
     </tr>
   `).join('');
@@ -630,7 +630,7 @@ function initNotificationForm() {
       } else {
         countEl.textContent = '0 Devices';
       }
-    } catch(err) {
+    } catch (err) {
       countEl.textContent = '0 Devices';
     }
   }
@@ -673,7 +673,7 @@ function initNotificationForm() {
         } else {
           serverMessage = resJson.message || 'Unable to broadcast push notification.';
         }
-      } catch(err) {
+      } catch (err) {
         console.log('Notification via GAS failed:', err);
         serverMessage = err.toString();
       }
@@ -907,13 +907,13 @@ function displayAppointmentsRows(appointments) {
       statusBadge = '<span class="badge" style="background:rgba(231,76,60,0.15); color:#e74c3c; border:1px solid #e74c3c;">❌ Rejected</span>';
     }
 
-    const formattedBookedOn = apt.timestamp ? new Date(apt.timestamp).toLocaleDateString('en-IN', { day:'2-digit', month:'short', year:'numeric' }) : 'N/A';
+    const formattedBookedOn = apt.timestamp ? new Date(apt.timestamp).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : 'N/A';
 
     let visitDate = 'TBD', visitTime = 'TBD';
     try {
-      if (apt.date) visitDate = new Date(apt.date).toLocaleDateString('en-IN', { day:'2-digit', month:'short', year:'numeric' });
-      if (apt.time) visitTime = new Date(apt.time).toLocaleTimeString('en-IN', { hour:'2-digit', minute:'2-digit', hour12:true });
-    } catch(e) {}
+      if (apt.date) visitDate = new Date(apt.date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+      if (apt.time) visitTime = new Date(apt.time).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true });
+    } catch (e) { }
 
     const phoneClean = String(apt.phone || '').replace(/[^0-9]/g, '');
 
