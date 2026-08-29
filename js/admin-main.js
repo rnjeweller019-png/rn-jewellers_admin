@@ -663,7 +663,7 @@ function initNotificationForm() {
         const payload = encodeURIComponent(JSON.stringify({
           title,
           message,
-          onesignal_app_id: CONFIG.ONESIGNAL_APP_ID || ''
+          onesignal_app_id: CONFIG.ONESIGNAL_APP_ID || '91a28970-9e1b-4343-a379-de2a1923e7a7'
         }));
         const res = await fetch(`${CONFIG.APPS_SCRIPT_URL}?action=sendNotification&data=${payload}`);
         const resJson = await res.json();
