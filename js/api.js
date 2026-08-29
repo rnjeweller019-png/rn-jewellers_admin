@@ -169,15 +169,40 @@ const API = {
   // Dynamic Jewellery Pricing Formula:
   // Final Price = (Weight × Rate) + Making Charge - Discount
   calculateProductPrice(product, rates = this.getRates()) {
+    const isSilver = String(product.metal).toLowerCase() === 'silver';
     let metalRate = rates.gold_22k;
-    if (product.metal === 'silver') {
-      metalRate = rates.silver;
-    } else if (product.purity === '24K') {
-      metalRate = rates.gold_24k || (rates.gold_22k * 1.09);
-    } else if (product.purity === '18K') {
-      metalRate = rates.gold_24k ? (rates.gold_24k * (18 / 24)) : (rates.gold_22k * (18 / 22));
-    } else if (product.purity === '14K') {
-      metalRate = rates.gold_24k ? (rates.gold_24k * (14 / 24)) : (rates.gold_22k * (14 / 22));
+    let metalName = 'Gold';
+    let purityText = product.purity || '22K Gold';
+
+    if (isSilver) {
+      metalName = 'Silver';
+      const purityUpper = String(product.purity || '').toUpperCase();
+      if (purityUpper.includes('925') || purityUpper.includes('STERLING') || purityUpper.includes('92.5')) {
+        metalRate = rates.silver * 0.925;
+        purityText = '925 Sterling Silver';
+      } else if (purityUpper.includes('999') || purityUpper.includes('FINE') || purityUpper.includes('PURE')) {
+        metalRate = rates.silver;
+        purityText = '999 Fine Silver';
+      } else {
+        metalRate = rates.silver;
+        purityText = product.purity ? `${product.purity} Silver` : 'Silver';
+      }
+    } else {
+      metalName = 'Gold';
+      const purityUpper = String(product.purity || '').toUpperCase();
+      if (purityUpper.includes('24K')) {
+        metalRate = rates.gold_24k || (rates.gold_22k * 1.09);
+        purityText = '24K Gold';
+      } else if (purityUpper.includes('18K')) {
+        metalRate = rates.gold_24k ? (rates.gold_24k * (18 / 24)) : (rates.gold_22k * (18 / 22));
+        purityText = '18K Gold';
+      } else if (purityUpper.includes('14K')) {
+        metalRate = rates.gold_24k ? (rates.gold_24k * (14 / 24)) : (rates.gold_22k * (14 / 22));
+        purityText = '14K Gold';
+      } else {
+        metalRate = rates.gold_22k;
+        purityText = '22K Gold';
+      }
     }
 
     const rawMetalCost = (parseFloat(product.weight_g) || 0) * metalRate;
@@ -217,7 +242,10 @@ const API = {
     return {
       ...product,
       calculated: {
-        metal_rate: metalRate,
+        is_silver: isSilver,
+        metal_name: metalName,
+        purity_text: purityText,
+        metal_rate: Math.round(metalRate),
         raw_metal_cost: Math.round(rawMetalCost),
         making_type: makingType,
         making_val: makingVal,

@@ -290,6 +290,28 @@ function initProductForm() {
   const form = document.getElementById('admin-product-form');
   if (!form) return;
 
+  const metalSelect = document.getElementById('admin-p-metal');
+  const puritySelect = document.getElementById('admin-p-purity');
+  if (metalSelect && puritySelect) {
+    metalSelect.addEventListener('change', () => {
+      const isSilver = metalSelect.value === 'silver';
+      if (isSilver) {
+        puritySelect.innerHTML = `
+          <option value="925 Silver">925 Sterling Silver (92.5%)</option>
+          <option value="999 Silver">999 Fine Silver (99.9%)</option>
+          <option value="900 Silver">900 Coin Silver</option>
+        `;
+      } else {
+        puritySelect.innerHTML = `
+          <option value="22K">22K Gold (BIS 916)</option>
+          <option value="24K">24K Pure Gold</option>
+          <option value="18K">18K Gold</option>
+          <option value="14K">14K Gold</option>
+        `;
+      }
+    });
+  }
+
   form.addEventListener('submit', (e) => {
     e.preventDefault();
     let imgVal = (document.getElementById('admin-p-image').value || '').trim();
