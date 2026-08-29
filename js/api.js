@@ -63,7 +63,8 @@ const API = {
                 product_discount: parseFloat(p.product_discount) || 0,
                 image_urls: imgs,
                 is_featured: p.is_featured === true || String(p.is_featured).toLowerCase() === 'true' || p.is_featured === 1 || p.is_featured === '1',
-                is_new_arrival: p.is_new_arrival === true || String(p.is_new_arrival).toLowerCase() === 'true' || p.is_new_arrival === 1 || p.is_new_arrival === '1'
+                is_new_arrival: p.is_new_arrival === true || String(p.is_new_arrival).toLowerCase() === 'true' || p.is_new_arrival === 1 || p.is_new_arrival === '1',
+                is_no_making_charge: p.is_no_making_charge === true || String(p.is_no_making_charge).toLowerCase() === 'true'
               };
             });
             localStorage.setItem('rnj_products', JSON.stringify(cleanProducts));
@@ -179,7 +180,8 @@ const API = {
     // Making charge calculation (percentage % vs fixed ₹)
     const makingType = product.making_type || 'percentage';
     const makingVal = parseFloat(product.making_charge) || 0;
-    const isFreeMaking = product.is_no_making_charge === true || String(product.is_no_making_charge).toLowerCase() === 'true' || makingVal === 0;
+    const explicitNoMaking = product.is_no_making_charge === true || String(product.is_no_making_charge).toLowerCase() === 'true';
+    const isFreeMaking = explicitNoMaking || (makingVal === 0 && (product.making_charge === 0 || product.making_charge === '0'));
 
     let makingAmount = 0;
     let makingText = '0%';
