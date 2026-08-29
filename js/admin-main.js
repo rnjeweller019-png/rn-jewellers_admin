@@ -720,6 +720,44 @@ function initNotificationForm() {
 
     form.reset();
   });
+
+  renderSubscribersTable();
+}
+
+function renderSubscribersTable() {
+  const tbody = document.getElementById('admin-subscribers-tbody');
+  if (!tbody) return;
+
+  tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:20px;">⏳ Loading subscribed devices...</td></tr>';
+
+  if (!CONFIG.APPS_SCRIPT_URL) {
+    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:20px; color:var(--text-muted);">Apps Script URL not configured.</td></tr>';
+    return;
+  }
+
+  fetch(`${CONFIG.APPS_SCRIPT_URL}?action=exportSubscribers&_t=${Date.now()}`, { cache: 'no-store' })
+    .then(res => res.json())
+    .then(res => {
+      if (res.status === 'success' && Array.isArray(res.data) && res.data.length > 0) {
+        tbody.innerHTML = res.data.reverse().map(sub => {
+          const dateStr = sub.timestamp ? new Date(sub.timestamp).toLocaleString('en-IN', { dateStyle: 'short', timeStyle: 'short' }) : 'Recently';
+          const isMobile = String(sub.device).toLowerCase().includes('mobile') || String(sub.browser).toLowerCase().includes('mobile');
+          return `
+            <tr>
+              <td><span style="font-size:0.82rem; color:var(--text-muted);">${dateStr}</span></td>
+              <td><span class="badge" style="background:${isMobile ? 'rgba(52,152,219,0.15)' : 'rgba(155,89,182,0.15)'}; color:${isMobile ? '#3498db' : '#9b59b6'}; font-size:0.75rem;"><i class="fas fa-${isMobile ? 'mobile-alt' : 'desktop'}"></i> ${isMobile ? 'Mobile' : 'Desktop'}</span></td>
+              <td><span style="font-size:0.82rem;">${escapeHtml(sub.timezone || 'Asia/Kolkata')}</span></td>
+              <td><code style="font-size:0.72rem; color:var(--gold-light);">${escapeHtml(sub.subscription_id ? sub.subscription_id.substring(0, 16) + '...' : 'Subscribed')}</code></td>
+            </tr>
+          `;
+        }).join('');
+      } else {
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:30px; color:var(--text-muted);"><i class="fas fa-bell-slash" style="font-size:1.8rem; margin-bottom:8px; display:block;"></i>No subscriber devices logged yet. Open storefront on phone &amp; tap Allow!</td></tr>';
+      }
+    })
+    .catch(() => {
+      tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:20px; color:var(--text-muted);">Unable to load subscribers.</td></tr>';
+    });
 }
 
 // EXPORT ENQUIRIES TO CSV

@@ -467,6 +467,27 @@
             <div id="notify-send-status" style="display:none; margin-top:15px; padding:12px; background:rgba(46,204,113,0.1); border:1px solid rgba(46,204,113,0.3); border-radius:8px; font-size:0.875rem; white-space:pre-line; line-height:1.6;"></div>
           </form>
         </div>
+
+        <!-- SUBSCRIBED DEVICES AUDIENCE LIST CARD -->
+        <div class="table-card" style="margin-top:25px; max-width:650px;">
+          <div class="table-header" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+            <h2>Subscribed Devices &amp; Audience List</h2>
+            <button onclick="renderSubscribersTable()" class="btn btn-secondary btn-sm" style="font-size:0.8rem;"><i class="fas fa-sync-alt"></i> Refresh List</button>
+          </div>
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Date Logged</th>
+                <th>Device</th>
+                <th>Timezone</th>
+                <th>Subscription ID</th>
+              </tr>
+            </thead>
+            <tbody id="admin-subscribers-tbody">
+              <!-- Rendered via JS -->
+            </tbody>
+          </table>
+        </div>
       </section>
 
       <!-- SECTION 6: BULK CSV IMPORT -->
