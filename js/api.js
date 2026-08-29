@@ -44,7 +44,7 @@ const API = {
     if (!CONFIG.APPS_SCRIPT_URL) return;
 
     try {
-      const prodPromise = fetch(`${CONFIG.APPS_SCRIPT_URL}?action=getProducts`)
+      const prodPromise = fetch(`${CONFIG.APPS_SCRIPT_URL}?action=getProducts&_t=${Date.now()}`, { cache: 'no-store' })
         .then(res => res.json())
         .then(prodJson => {
           if (prodJson.status === 'success' && Array.isArray(prodJson.data)) {
@@ -71,7 +71,7 @@ const API = {
           }
         }).catch(e => console.log('Products sync error:', e));
 
-      const setPromise = fetch(`${CONFIG.APPS_SCRIPT_URL}?action=getSettings`)
+      const setPromise = fetch(`${CONFIG.APPS_SCRIPT_URL}?action=getSettings&_t=${Date.now()}`, { cache: 'no-store' })
         .then(res => res.json())
         .then(setJson => {
           if (setJson.status === 'success' && setJson.data && setJson.data.gold_22k_rate) {
@@ -96,7 +96,7 @@ const API = {
     if (!CONFIG.APPS_SCRIPT_URL) return false;
 
     try {
-      const res = await fetch(`${CONFIG.APPS_SCRIPT_URL}?action=getSettings`);
+      const res = await fetch(`${CONFIG.APPS_SCRIPT_URL}?action=getSettings&_t=${Date.now()}`, { cache: 'no-store' });
       const setJson = await res.json();
 
       if (setJson.status === 'success' && setJson.data) {

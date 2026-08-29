@@ -212,7 +212,7 @@ function renderOverviewStats() {
   if (enquiriesCountEl) enquiriesCountEl.textContent = enquiries.length;
 
   if (CONFIG.APPS_SCRIPT_URL && visitorCountEl) {
-    fetch(`${CONFIG.APPS_SCRIPT_URL}?action=exportAnalytics`)
+    fetch(`${CONFIG.APPS_SCRIPT_URL}?action=exportAnalytics&_t=${Date.now()}`, { cache: 'no-store' })
       .then(res => res.json())
       .then(res => {
         if (res.status === 'success' && Array.isArray(res.data) && res.data.length > 0) {
@@ -389,7 +389,7 @@ function renderEnquiriesTable() {
   if (!tbody) return;
 
   if (CONFIG.APPS_SCRIPT_URL) {
-    fetch(`${CONFIG.APPS_SCRIPT_URL}?action=exportEnquiries`)
+    fetch(`${CONFIG.APPS_SCRIPT_URL}?action=exportEnquiries&_t=${Date.now()}`, { cache: 'no-store' })
       .then(res => res.json())
       .then(res => {
         if (res.status === 'success' && Array.isArray(res.data) && res.data.length > 0) {
