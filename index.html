@@ -240,8 +240,8 @@
               </div>
               <div class="form-group">
                 <label class="form-label">Metal & Purity *</label>
-                <div style="display:flex; gap:8px;">
-                  <select id="admin-p-metal" class="form-control">
+                <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                  <select id="admin-p-metal" class="form-control" style="min-width:100px;">
                     <option value="gold">Gold</option>
                     <option value="silver">Silver</option>
                   </select>
@@ -255,8 +255,28 @@
                     <option value="Normal Silver">Normal Silver</option>
                     <option value="999 Silver">999 Fine Silver (99.9%)</option>
                     <option value="900 Silver">900 Coin Silver</option>
+                    <option value="custom">✏️ Custom (type below)…</option>
                   </select>
                 </div>
+                <input type="text" id="admin-p-purity-custom" class="form-control" placeholder="e.g. Rose Gold 18K, 950 Platinum, Silver Plated…" style="display:none; margin-top:8px;">
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Certification / Hallmark Label</label>
+                <input type="text" id="admin-p-certification" class="form-control" list="cert-presets" placeholder="e.g. BIS 916 Hallmark, 925 Sterling Certified…">
+                <datalist id="cert-presets">
+                  <option value="BIS 916 Hallmark"></option>
+                  <option value="BIS 999 Hallmark"></option>
+                  <option value="BIS Hallmarked Gold"></option>
+                  <option value="925 Sterling Silver Certified"></option>
+                  <option value="999 Fine Silver"></option>
+                  <option value="Italian Silver Certified"></option>
+                  <option value="Italian Silver"></option>
+                  <option value="Normal Silver"></option>
+                  <option value="Hallmarked Gold"></option>
+                  <option value="No Hallmark"></option>
+                </datalist>
+                <small style="color:var(--text-muted); font-size:0.75rem;">This label appears on the product card & detail page. Type or pick from presets.</small>
               </div>
             </div>
 
@@ -267,13 +287,26 @@
               </div>
               <div class="form-group">
                 <label class="form-label">Making Charge *</label>
-                <div style="display:flex; gap:6px;">
-                  <select id="admin-p-making-type" class="form-control" style="width:110px; font-size:0.85rem;">
-                    <option value="percentage">% Percentage</option>
-                    <option value="fixed">₹ Fixed</option>
+                <div style="display:flex; gap:6px; flex-wrap:wrap; align-items:center;">
+                  <select id="admin-p-making-type" class="form-control" style="min-width:90px; font-size:0.85rem;">
+                    <option value="percentage">% of metal cost</option>
+                    <option value="fixed">₹ Flat amount</option>
                   </select>
-                  <input type="number" id="admin-p-making" class="form-control" step="0.1" required placeholder="e.g. 12 for 12%">
+                  <input type="number" id="admin-p-making" class="form-control" step="0.01" required placeholder="e.g. 12" style="min-width:80px; max-width:100px;">
+                  <select id="admin-p-making-basis" class="form-control" style="min-width:130px; font-size:0.85rem;">
+                    <option value="per_gram">per gram</option>
+                    <option value="per_10g">per 10 grams (slab)</option>
+                    <option value="per_100g">per 100 grams (slab)</option>
+                  </select>
                 </div>
+                <div id="making-formula-preview" style="margin-top:8px; padding:8px 12px; background:rgba(201,168,76,0.07); border-left:3px solid var(--border-gold); border-radius:4px; font-size:0.8rem; color:var(--gold-light); display:none;">
+                  — enter weight &amp; making charge to see formula
+                </div>
+                <small style="color:var(--text-muted); font-size:0.75rem;">
+                  <b>per gram</b>: charge on each gram separately &nbsp;|&nbsp;
+                  <b>per 10g slab</b>: weight rounded down to nearest 10g &nbsp;|&nbsp;
+                  <b>₹ flat</b>: fixed amount regardless of weight
+                </small>
               </div>
               <div class="form-group">
                 <label class="form-label">Product Discount %</label>

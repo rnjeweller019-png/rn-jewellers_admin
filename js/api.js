@@ -205,10 +205,12 @@ const API = {
       }
     }
 
-    const rawMetalCost = (parseFloat(product.weight_g) || 0) * metalRate;
-    
-    // Making charge calculation (percentage % vs fixed ₹)
+    const weight = parseFloat(product.weight_g) || 0;
+    const rawMetalCost = weight * metalRate;
+
+    // Making charge calculation — supports per_gram / per_10g / per_100g slab / fixed ₹
     const makingType = product.making_type || 'percentage';
+    const makingBasis = product.making_basis || 'per_gram';
     const makingVal = parseFloat(product.making_charge) || 0;
     const explicitNoMaking = product.is_no_making_charge === true || String(product.is_no_making_charge).toLowerCase() === 'true';
     const isFreeMaking = explicitNoMaking || (makingVal === 0 && (product.making_charge === 0 || product.making_charge === '0'));
@@ -219,12 +221,20 @@ const API = {
     if (isFreeMaking) {
       makingAmount = 0;
       makingText = '0% (FREE)';
-    } else if (makingType === 'percentage' || makingVal <= 50) { // Values <= 50 are treated as percentage
-      makingAmount = (rawMetalCost * makingVal) / 100;
-      makingText = `${makingVal}%`;
-    } else {
+    } else if (makingType === 'fixed') {
       makingAmount = makingVal;
-      makingText = `₹${makingVal.toLocaleString('en-IN')}`;
+      makingText = `₹${makingVal.toLocaleString('en-IN')} (flat)`;
+    } else {
+      let effectiveWeight = weight;
+      if (makingBasis === 'per_10g') {
+        effectiveWeight = Math.floor(weight / 10) * 10;
+      } else if (makingBasis === 'per_100g') {
+        effectiveWeight = Math.floor(weight / 100) * 100;
+      }
+      const effectiveCost = effectiveWeight * metalRate;
+      makingAmount = (effectiveCost * makingVal) / 100;
+      const basisLabel = makingBasis === 'per_10g' ? '/10g slab' : makingBasis === 'per_100g' ? '/100g slab' : '';
+      makingText = `${makingVal}%${basisLabel}`;
     }
 
     const grossPrice = rawMetalCost + makingAmount;
@@ -248,6 +258,7 @@ const API = {
         metal_rate: Math.round(metalRate),
         raw_metal_cost: Math.round(rawMetalCost),
         making_type: makingType,
+        making_basis: makingBasis,
         making_val: makingVal,
         making_amount: Math.round(makingAmount),
         making_text: makingText,

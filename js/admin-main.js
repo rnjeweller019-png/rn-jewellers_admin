@@ -292,57 +292,124 @@ function initProductForm() {
 
   const metalSelect = document.getElementById('admin-p-metal');
   const puritySelect = document.getElementById('admin-p-purity');
-  if (metalSelect && puritySelect) {
-    metalSelect.addEventListener('change', () => {
-      const isSilver = metalSelect.value === 'silver';
-      if (isSilver) {
-        puritySelect.innerHTML = `
-          <option value="925 Silver">925 Sterling Silver (92.5%)</option>
-          <option value="Italian Silver">Italian Silver</option>
-          <option value="Normal Silver">Normal Silver</option>
-          <option value="999 Silver">999 Fine Silver (99.9%)</option>
-          <option value="900 Silver">900 Coin Silver</option>
-        `;
-      } else {
-        puritySelect.innerHTML = `
-          <option value="22K">22K Gold (BIS 916)</option>
-          <option value="24K">24K Pure Gold</option>
-          <option value="18K">18K Gold</option>
-          <option value="14K">14K Gold</option>
-        `;
-      }
-    });
+  const purityCustomInput = document.getElementById('admin-p-purity-custom');
+
+  // --- Metal change: swap purity dropdown options + include Custom option ---
+  function updatePurityOptions(metal, selectedPurity) {
+    const isSilver = metal === 'silver';
+    puritySelect.innerHTML = isSilver ? `
+      <option value="925 Silver">925 Sterling Silver (92.5%)</option>
+      <option value="Italian Silver">Italian Silver</option>
+      <option value="Normal Silver">Normal Silver</option>
+      <option value="999 Silver">999 Fine Silver (99.9%)</option>
+      <option value="900 Silver">900 Coin Silver</option>
+      <option value="custom">✏️ Custom (type below)…</option>
+    ` : `
+      <option value="22K">22K Gold (BIS 916)</option>
+      <option value="24K">24K Pure Gold</option>
+      <option value="18K">18K Gold</option>
+      <option value="14K">14K Gold</option>
+      <option value="custom">✏️ Custom (type below)…</option>
+    `;
+    if (selectedPurity) puritySelect.value = selectedPurity;
+    toggleCustomPurity();
   }
 
+  // --- Show/hide custom purity text input ---
+  function toggleCustomPurity() {
+    if (!purityCustomInput) return;
+    purityCustomInput.style.display = puritySelect.value === 'custom' ? 'block' : 'none';
+    if (puritySelect.value !== 'custom') purityCustomInput.value = '';
+  }
+
+  if (metalSelect) metalSelect.addEventListener('change', () => updatePurityOptions(metalSelect.value));
+  if (puritySelect) puritySelect.addEventListener('change', toggleCustomPurity);
+
+  // --- Live Making Charge Formula Preview ---
+  function updateMakingPreview() {
+    const preview = document.getElementById('making-formula-preview');
+    if (!preview) return;
+    const makingType = document.getElementById('admin-p-making-type')?.value || 'percentage';
+    const makingVal = parseFloat(document.getElementById('admin-p-making')?.value) || 0;
+    const basis = document.getElementById('admin-p-making-basis')?.value || 'per_gram';
+    const weight = parseFloat(document.getElementById('admin-p-weight')?.value) || 0;
+    const rates = API.getRates();
+    const isSilver = metalSelect?.value === 'silver';
+    const metalRate = isSilver ? rates.silver : rates.gold_22k;
+
+    if (makingVal === 0 || weight === 0) {
+      preview.style.display = 'none';
+      return;
+    }
+
+    if (makingType === 'fixed') {
+      preview.style.display = 'block';
+      preview.innerHTML = `📐 <b>Flat ₹${makingVal.toLocaleString('en-IN')}</b> making charge regardless of weight`;
+      return;
+    }
+
+    const rawMetalCost = weight * metalRate;
+    let effectiveWeight = weight;
+    let basisLabel = 'per gram';
+    if (basis === 'per_10g') {
+      effectiveWeight = Math.floor(weight / 10) * 10;
+      basisLabel = `per 10g slab (${weight}g → counted as ${effectiveWeight}g)`;
+    } else if (basis === 'per_100g') {
+      effectiveWeight = Math.floor(weight / 100) * 100;
+      basisLabel = `per 100g slab (${weight}g → counted as ${effectiveWeight}g)`;
+    }
+    const effectiveCost = effectiveWeight * metalRate;
+    const makingAmt = Math.round((effectiveCost * makingVal) / 100);
+    preview.style.display = 'block';
+    preview.innerHTML = `📐 <b>${makingVal}%</b> ${basisLabel} &nbsp;→&nbsp; <b>₹${effectiveCost.toLocaleString('en-IN')}</b> × ${makingVal}% = <b>Making: ₹${makingAmt.toLocaleString('en-IN')}</b>`;
+  }
+
+  ['admin-p-weight','admin-p-making','admin-p-making-type','admin-p-making-basis'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener('input', updateMakingPreview);
+    if (el) el.addEventListener('change', updateMakingPreview);
+  });
+  if (metalSelect) metalSelect.addEventListener('change', updateMakingPreview);
+
+  // --- Submit Handler ---
   form.addEventListener('submit', (e) => {
     e.preventDefault();
     let imgVal = (document.getElementById('admin-p-image').value || '').trim();
-    if (imgVal.startsWith('../')) {
-      imgVal = imgVal.replace(/^(\.\.\/)+/, '');
-    }
+    if (imgVal.startsWith('../')) imgVal = imgVal.replace(/^(\.\.\/)+/, '');
     if (!imgVal) imgVal = 'assets/images/ring_1.jpg';
+
+    // Resolve purity — use custom text if "custom" selected
+    let purityVal = puritySelect.value;
+    if (purityVal === 'custom') {
+      purityVal = (purityCustomInput?.value || '').trim() || 'Custom';
+    }
 
     const productData = {
       id: document.getElementById('admin-p-id').value || null,
       name: document.getElementById('admin-p-name').value,
       category: document.getElementById('admin-p-category').value,
-      metal: document.getElementById('admin-p-metal').value,
-      purity: document.getElementById('admin-p-purity').value,
+      metal: metalSelect.value,
+      purity: purityVal,
+      certification: (document.getElementById('admin-p-certification')?.value || '').trim(),
       weight_g: parseFloat(document.getElementById('admin-p-weight').value) || 0,
       making_type: document.getElementById('admin-p-making-type').value,
+      making_basis: document.getElementById('admin-p-making-basis')?.value || 'per_gram',
       making_charge: parseFloat(document.getElementById('admin-p-making').value) || 0,
       product_discount: parseFloat(document.getElementById('admin-p-discount').value) || 0,
       description: document.getElementById('admin-p-desc').value,
       image_urls: [imgVal],
       is_featured: document.getElementById('admin-p-featured').checked,
       is_new_arrival: document.getElementById('admin-p-new').checked,
-      is_no_making_charge: document.getElementById('admin-p-no-making') ? document.getElementById('admin-p-no-making').checked : false
+      is_no_making_charge: document.getElementById('admin-p-no-making')?.checked || false
     };
 
     API.saveProduct(productData);
     alert('Product Saved Successfully!');
     form.reset();
     document.getElementById('admin-p-id').value = '';
+    if (purityCustomInput) purityCustomInput.style.display = 'none';
+    const preview = document.getElementById('making-formula-preview');
+    if (preview) preview.style.display = 'none';
     renderAdminProductsTable();
     renderOverviewStats();
   });
@@ -355,20 +422,60 @@ function editProduct(id) {
   document.getElementById('admin-p-id').value = product.id;
   document.getElementById('admin-p-name').value = product.name;
   document.getElementById('admin-p-category').value = product.category;
-  document.getElementById('admin-p-metal').value = product.metal;
-  document.getElementById('admin-p-purity').value = product.purity;
+
+  // Set metal first
+  const metalSel = document.getElementById('admin-p-metal');
+  if (metalSel) metalSel.value = product.metal || 'gold';
+
+  // Rebuild purity dropdown for correct metal, then set value
+  const puritySel = document.getElementById('admin-p-purity');
+  const purityCustom = document.getElementById('admin-p-purity-custom');
+  const isSilver = (product.metal || '').toLowerCase() === 'silver';
+  if (puritySel) {
+    puritySel.innerHTML = isSilver ? `
+      <option value="925 Silver">925 Sterling Silver (92.5%)</option>
+      <option value="Italian Silver">Italian Silver</option>
+      <option value="Normal Silver">Normal Silver</option>
+      <option value="999 Silver">999 Fine Silver (99.9%)</option>
+      <option value="900 Silver">900 Coin Silver</option>
+      <option value="custom">✏️ Custom (type below)…</option>
+    ` : `
+      <option value="22K">22K Gold (BIS 916)</option>
+      <option value="24K">24K Pure Gold</option>
+      <option value="18K">18K Gold</option>
+      <option value="14K">14K Gold</option>
+      <option value="custom">✏️ Custom (type below)…</option>
+    `;
+    // Try to match existing purity; if not found use custom
+    const knownPurities = Array.from(puritySel.options).map(o => o.value);
+    if (knownPurities.includes(product.purity)) {
+      puritySel.value = product.purity;
+      if (purityCustom) purityCustom.style.display = 'none';
+    } else {
+      puritySel.value = 'custom';
+      if (purityCustom) { purityCustom.style.display = 'block'; purityCustom.value = product.purity; }
+    }
+  }
+
   document.getElementById('admin-p-weight').value = product.weight_g;
+
   if (document.getElementById('admin-p-making-type')) {
     document.getElementById('admin-p-making-type').value = product.making_type || 'percentage';
   }
+  if (document.getElementById('admin-p-making-basis')) {
+    document.getElementById('admin-p-making-basis').value = product.making_basis || 'per_gram';
+  }
   document.getElementById('admin-p-making').value = product.making_charge || 0;
   document.getElementById('admin-p-discount').value = product.product_discount || 0;
-  document.getElementById('admin-p-desc').value = product.description;
+  document.getElementById('admin-p-desc').value = product.description || '';
   document.getElementById('admin-p-image').value = product.image_urls[0] || '';
   document.getElementById('admin-p-featured').checked = product.is_featured;
   document.getElementById('admin-p-new').checked = product.is_new_arrival;
   if (document.getElementById('admin-p-no-making')) {
     document.getElementById('admin-p-no-making').checked = product.is_no_making_charge === true || String(product.is_no_making_charge).toLowerCase() === 'true' || product.making_charge === 0;
+  }
+  if (document.getElementById('admin-p-certification')) {
+    document.getElementById('admin-p-certification').value = product.certification || '';
   }
 
   window.scrollTo({ top: document.getElementById('product-form-card').offsetTop - 100, behavior: 'smooth' });
