@@ -298,6 +298,8 @@ function initProductForm() {
       if (isSilver) {
         puritySelect.innerHTML = `
           <option value="925 Silver">925 Sterling Silver (92.5%)</option>
+          <option value="Italian Silver">Italian Silver</option>
+          <option value="Normal Silver">Normal Silver</option>
           <option value="999 Silver">999 Fine Silver (99.9%)</option>
           <option value="900 Silver">900 Coin Silver</option>
         `;

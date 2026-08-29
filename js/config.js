@@ -33,11 +33,23 @@ const CONFIG = {
   // Default Product Categories with Category-Level Discounts
   CATEGORIES: [
     { id: "rings", name: "Rings", discount: 10, icon: "fa-ring" },
-    { id: "necklaces", name: "Necklaces", discount: 5, icon: "fa-gem" },
+    { id: "men_ring", name: "Men Ring", discount: 10, icon: "fa-ring" },
+    { id: "girls_ring", name: "Girls Ring", discount: 10, icon: "fa-ring" },
+    { id: "necklaces", name: "Necklace", discount: 5, icon: "fa-gem" },
     { id: "earrings", name: "Earrings", discount: 15, icon: "fa-spa" },
     { id: "bangles", name: "Bangles & Kadas", discount: 0, icon: "fa-circle-notch" },
+    { id: "men_kada", name: "Men Kada", discount: 0, icon: "fa-circle-notch" },
+    { id: "kids_kada", name: "Kids Kada", discount: 0, icon: "fa-child" },
+    { id: "payal", name: "Payal", discount: 5, icon: "fa-shoe-prints" },
+    { id: "boys_bracelet", name: "Boys Bracelet", discount: 5, icon: "fa-hand-paper" },
+    { id: "girls_bracelet", name: "Girls Bracelet", discount: 5, icon: "fa-heart" },
+    { id: "chains", name: "Chains & Pendants", discount: 5, icon: "fa-link" },
+    { id: "men_chain", name: "Men Chain", discount: 5, icon: "fa-link" },
+    { id: "girls_chain", name: "Girls Chain", discount: 5, icon: "fa-link" },
+    { id: "kids_chain", name: "Kids Chain", discount: 5, icon: "fa-link" },
     { id: "sets", name: "Bridal Sets", discount: 12, icon: "fa-crown" },
-    { id: "chains", name: "Chains & Pendants", discount: 5, icon: "fa-link" }
+    { id: "silver_coins", name: "925 Silver Coins", discount: 0, icon: "fa-coins" },
+    { id: "silver_items", name: "Silver Items", discount: 5, icon: "fa-box-open" }
   ],
 
   // Pre-loaded Sample Products for immediate visual delight
