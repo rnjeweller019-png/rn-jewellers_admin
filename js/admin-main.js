@@ -482,14 +482,53 @@ function initNotificationForm() {
   const form = document.getElementById('admin-notify-form');
   if (!form) return;
 
-  form.addEventListener('submit', (e) => {
-    e.preventDefault();
-    const title = document.getElementById('notify-title').value;
-    const message = document.getElementById('notify-message').value;
+  // Show current subscription count if available
+  if (CONFIG.ONESIGNAL_APP_ID) {
+    const statusEl = document.getElementById('notify-subscriber-count');
+    if (statusEl) statusEl.textContent = 'Loading subscribers...';
+  }
 
-    // 1. Trigger Native Device Notification Popup Banner
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const title = document.getElementById('notify-title').value.trim();
+    const message = document.getElementById('notify-message').value.trim();
+    const submitBtn = form.querySelector('button[type="submit"]');
+    const statusEl = document.getElementById('notify-send-status');
+
+    if (!title || !message) return;
+
+    // Update button state
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Broadcasting...';
+    if (statusEl) {
+      statusEl.style.display = 'block';
+      statusEl.style.color = 'var(--gold-primary)';
+      statusEl.textContent = '⏳ Sending notification to all subscribers...';
+    }
+
+    let success = false;
+
+    // 1. Send via Google Apps Script backend (avoids CORS + exposes no secret keys)
+    if (CONFIG.APPS_SCRIPT_URL) {
+      try {
+        const payload = encodeURIComponent(JSON.stringify({
+          title,
+          message,
+          onesignal_app_id: CONFIG.ONESIGNAL_APP_ID || ''
+        }));
+        const res = await fetch(`${CONFIG.APPS_SCRIPT_URL}?action=sendNotification&data=${payload}`);
+        const resJson = await res.json();
+        if (resJson.status === 'success') {
+          success = true;
+        }
+      } catch(err) {
+        console.log('Notification via GAS failed, attempting direct fallback:', err);
+      }
+    }
+
+    // 2. Native browser Notification (local admin device preview only)
     if ('Notification' in window) {
-      const fireNotification = () => {
+      const fireLocalNotif = () => {
         const notifTitle = `✨ RN JEWELLERS: ${title}`;
         const notifOptions = { body: message, icon: 'assets/logo.png', requireInteraction: true };
         if ('serviceWorker' in navigator) {
@@ -506,40 +545,30 @@ function initNotificationForm() {
       };
 
       if (Notification.permission === 'granted') {
-        fireNotification();
+        fireLocalNotif();
       } else if (Notification.permission !== 'denied') {
         Notification.requestPermission().then(perm => {
-          if (perm === 'granted') fireNotification();
+          if (perm === 'granted') fireLocalNotif();
         });
       }
     }
 
-    // 2. Save broadcast promo to local store & Google Sheets for promo banner
-    const promos = JSON.parse(localStorage.getItem('rnj_promotions')) || [];
+    // 3. Save to rnj_promotions for the on-site promo banner
+    const promos = JSON.parse(localStorage.getItem('rnj_promotions') || '[]');
     promos.unshift({ title, message, date: new Date().toISOString() });
     localStorage.setItem('rnj_promotions', JSON.stringify(promos));
 
-    // 3. Send to OneSignal Web Push subscribers
-    if (CONFIG.ONESIGNAL_APP_ID) {
-      const payload = {
-        app_id: CONFIG.ONESIGNAL_APP_ID,
-        included_segments: ["Subscribers", "Total Subscriptions"],
-        headings: { "en": title },
-        contents: { "en": message },
-        url: window.location.origin
-      };
+    // Update UI feedback
+    submitBtn.disabled = false;
+    submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Broadcast to All Subscribers';
 
-      fetch('https://onesignal.com/api/v1/notifications', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Basic os_v2_app_sgris4e6dnbuhi3z3yvbsi7hu63os6qfco4uyyus6sysdf5ok6t6d5lrmcbskdcay7f7g3hme6tgua5mcawuq54roedsaq4xly2ludy'
-        },
-        body: JSON.stringify(payload)
-      }).catch(err => console.log('OneSignal push err:', err));
+    if (statusEl) {
+      statusEl.style.color = '#2ecc71';
+      statusEl.textContent = success
+        ? `✅ Notification broadcasted successfully to all subscribers!\n\nTitle: "${title}"\nMessage: "${message}"`
+        : `⚠️ Local preview sent. To broadcast to all subscribers, configure the OneSignal REST API key in your Google Apps Script.`;
     }
 
-    alert(`🔔 Notification Broadcasted Successfully!\n\nTitle: "${title}"\nMessage: "${message}"`);
     form.reset();
   });
 }

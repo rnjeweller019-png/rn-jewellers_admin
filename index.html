@@ -396,6 +396,11 @@
           <div class="table-header">
             <h2>Send Broadcast Push Notification</h2>
           </div>
+          <p style="color:var(--text-muted); font-size:0.85rem; margin-bottom:20px;">
+            <i class="fas fa-info-circle" style="color:var(--gold-primary);"></i>
+            This broadcasts to all customers who have subscribed to push notifications on the website.
+            A local preview will also appear on this device.
+          </p>
           <form id="admin-notify-form">
             <div class="form-group">
               <label class="form-label">Notification Title</label>
@@ -403,9 +408,10 @@
             </div>
             <div class="form-group">
               <label class="form-label">Message Body</label>
-              <textarea id="notify-message" class="form-control" required placeholder="Check out our latest 22K hallmarked bridal sets with 15% off making charges."></textarea>
+              <textarea id="notify-message" class="form-control" required placeholder="Check out our latest 22K hallmarked bridal sets with 15% off making charges." rows="3"></textarea>
             </div>
             <button type="submit" class="btn btn-primary"><i class="fas fa-paper-plane"></i> Broadcast to All Subscribers</button>
+            <div id="notify-send-status" style="display:none; margin-top:15px; padding:12px; background:rgba(46,204,113,0.1); border:1px solid rgba(46,204,113,0.3); border-radius:8px; font-size:0.875rem; white-space:pre-line; line-height:1.6;"></div>
           </form>
         </div>
       </section>
