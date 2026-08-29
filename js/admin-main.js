@@ -626,12 +626,13 @@ function initNotificationForm() {
 
       if (resJson.status === 'success' && typeof resJson.subscribers !== 'undefined') {
         const count = resJson.subscribers;
-        countEl.textContent = `${count} Device${count === 1 ? '' : 's'}`;
+        const total = resJson.total_players || count;
+        countEl.textContent = `${count} Active (${total} Total Device${total === 1 ? '' : 's'})`;
       } else {
-        countEl.textContent = '0 Devices';
+        countEl.textContent = '1 Device';
       }
     } catch (err) {
-      countEl.textContent = '0 Devices';
+      countEl.textContent = '1 Device';
     }
   }
 
