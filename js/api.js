@@ -85,7 +85,23 @@ const API = {
           }
         }).catch(e => console.log('Settings sync error:', e));
 
-      await Promise.all([prodPromise, setPromise]);
+      const enqPromise = fetch(`${CONFIG.APPS_SCRIPT_URL}?action=exportEnquiries&_t=${Date.now()}`, { cache: 'no-store' })
+        .then(res => res.json())
+        .then(json => {
+          if (json.status === 'success' && Array.isArray(json.data)) {
+            localStorage.setItem('rnj_submitEnquiry', JSON.stringify(json.data));
+          }
+        }).catch(() => {});
+
+      const aptPromise = fetch(`${CONFIG.APPS_SCRIPT_URL}?action=exportAppointments&_t=${Date.now()}`, { cache: 'no-store' })
+        .then(res => res.json())
+        .then(json => {
+          if (json.status === 'success' && Array.isArray(json.data)) {
+            localStorage.setItem('rnj_submitAppointment', JSON.stringify(json.data));
+          }
+        }).catch(() => {});
+
+      await Promise.all([prodPromise, setPromise, enqPromise, aptPromise]);
     } catch (err) {
       console.log('Server sync error:', err);
     }
