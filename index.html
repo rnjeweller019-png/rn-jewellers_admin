@@ -575,7 +575,17 @@
               </tbody>
             </table>
           </div>
-          <p style="color:var(--text-muted); font-size:0.82rem; margin-bottom:20px;"><strong>Example row:</strong> <code>Silver Anklet,payals,silver,92.5,15,500,"Handcrafted, lightweight anklet",https://...</code></p>
+          <p style="color:var(--text-muted); font-size:0.85rem; margin-bottom:10px;"><strong>📋 Plain Text Format — your CSV file should look exactly like this:</strong></p>
+          <pre style="background:#0d0d0d; color:#d4af37; font-size:0.78rem; padding:16px 18px; border-radius:8px; border:1px solid var(--border-gold); overflow-x:auto; line-height:1.7; margin-bottom:20px; white-space:pre;">Name,Category,Metal,Purity,Weight(g),MakingCharge,Description,ImageURL
+Silver Anklet,payals,silver,92.5,15,500,Simple handcrafted anklet,https://your-image-url.com/anklet.jpg
+Silver Ring,rings,silver,92.5,8,200,Daily wear silver ring,
+Gold Necklace,necklaces,gold,22K,30,3000,"Bridal necklace, hand finished",https://your-image-url.com/necklace.jpg</pre>
+          <p style="color:var(--text-muted); font-size:0.8rem; margin-bottom:20px;">
+            &#128204; <strong>Row 1</strong> is always the header — it will be skipped automatically.<br>
+            &#128204; If <strong>Description</strong> has a comma inside, wrap it in <strong>"double quotes"</strong>.<br>
+            &#128204; <strong>Image URL</strong> is optional — leave it empty if you don't have one.<br>
+            &#128204; <strong>Category</strong> must be one of: rings / necklaces / earrings / bangles / payals / chains
+          </p>
           <input type="file" id="csv-file-input" accept=".csv" style="display:none;">
           <button id="csv-import-btn" class="btn btn-primary"><i class="fas fa-file-upload"></i> Choose &amp; Import CSV File</button>
         </div>
