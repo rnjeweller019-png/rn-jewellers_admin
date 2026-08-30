@@ -373,36 +373,29 @@
           <form id="admin-rate-form">
             <div class="form-group">
               <label class="form-label">Gold 22K Rate (₹ / Gram)</label>
-              <div style="display:flex; align-items:center; gap:12px;">
-                <input type="number" id="admin-rate-22k" class="form-control" required style="flex:1;">
-                <label style="display:flex; align-items:center; gap:6px; font-size:0.83rem; color:var(--text-muted); white-space:nowrap; cursor:pointer;">
-                  <input type="checkbox" id="admin-show-22k" checked style="accent-color:var(--gold-primary); width:16px; height:16px;">
-                  Show in Ticker
-                </label>
-              </div>
+              <input type="number" id="admin-rate-22k" class="form-control" required>
+              <label style="margin-top:6px; font-size:0.85rem; color:var(--text-muted); display:flex; align-items:center; gap:8px; cursor:pointer;">
+                <input type="checkbox" id="admin-show-22k" checked style="accent-color:var(--gold-primary); width:16px; height:16px;">
+                Display 22K Gold Rate in Storefront Ticker
+              </label>
             </div>
             <div class="form-group">
               <label class="form-label">Gold 24K Rate (₹ / Gram)</label>
-              <div style="display:flex; align-items:center; gap:12px;">
-                <input type="number" id="admin-rate-24k" class="form-control" required style="flex:1;">
-                <label style="display:flex; align-items:center; gap:6px; font-size:0.83rem; color:var(--text-muted); white-space:nowrap; cursor:pointer;">
-                  <input type="checkbox" id="admin-show-24k" checked style="accent-color:var(--gold-primary); width:16px; height:16px;">
-                  Show in Ticker
-                </label>
-              </div>
+              <input type="number" id="admin-rate-24k" class="form-control" required>
+              <label style="margin-top:6px; font-size:0.85rem; color:var(--text-muted); display:flex; align-items:center; gap:8px; cursor:pointer;">
+                <input type="checkbox" id="admin-show-24k" checked style="accent-color:var(--gold-primary); width:16px; height:16px;">
+                Display 24K Gold Rate in Storefront Ticker
+              </label>
             </div>
             <div class="form-group">
               <label class="form-label">Silver Rate (₹ / Gram)</label>
-              <div style="display:flex; align-items:center; gap:12px;">
-                <input type="number" id="admin-rate-silver" class="form-control" required style="flex:1;">
-                <label style="display:flex; align-items:center; gap:6px; font-size:0.83rem; color:var(--text-muted); white-space:nowrap; cursor:pointer;">
-                  <input type="checkbox" id="admin-show-silver" checked style="accent-color:var(--gold-primary); width:16px; height:16px;">
-                  Show in Ticker
-                </label>
-              </div>
+              <input type="number" id="admin-rate-silver" class="form-control" required>
+              <label style="margin-top:6px; font-size:0.85rem; color:var(--text-muted); display:flex; align-items:center; gap:8px; cursor:pointer;">
+                <input type="checkbox" id="admin-show-silver" checked style="accent-color:var(--gold-primary); width:16px; height:16px;">
+                Display Silver Rate in Storefront Ticker
+              </label>
             </div>
-            <small style="color:var(--text-muted); font-size:0.78rem; display:block; margin-bottom:14px;"><i class="fas fa-info-circle" style="color:var(--gold-primary);"></i> Uncheck "Show in Ticker" to hide that rate from the live ticker bar on your website.</small>
-            <button type="submit" class="btn btn-primary"><i class="fas fa-sync"></i> Update Rates & Recalculate All Prices</button>
+            <button type="submit" class="btn btn-primary"><i class="fas fa-sync"></i> Update Rates & Ticker Visibility Settings</button>
           </form>
         </div>
       </section>

@@ -499,41 +499,29 @@ function initRateForm() {
   document.getElementById('admin-rate-24k').value = currentRates.gold_24k;
   document.getElementById('admin-rate-silver').value = currentRates.silver;
 
-  // Load saved ticker visibility from localStorage
-  const visibility = JSON.parse(localStorage.getItem('rnj_ticker_visibility') || '{"show_22k":true,"show_24k":true,"show_silver":true}');
-  document.getElementById('admin-show-22k').checked = visibility.show_22k !== false;
-  document.getElementById('admin-show-24k').checked = visibility.show_24k !== false;
-  document.getElementById('admin-show-silver').checked = visibility.show_silver !== false;
+  if (document.getElementById('admin-show-22k')) {
+    document.getElementById('admin-show-22k').checked = currentRates.show_gold_22k !== false && currentRates.show_gold_22k !== '0' && currentRates.show_gold_22k !== 0;
+  }
+  if (document.getElementById('admin-show-24k')) {
+    document.getElementById('admin-show-24k').checked = currentRates.show_gold_24k !== false && currentRates.show_gold_24k !== '0' && currentRates.show_gold_24k !== 0;
+  }
+  if (document.getElementById('admin-show-silver')) {
+    document.getElementById('admin-show-silver').checked = currentRates.show_silver !== false && currentRates.show_silver !== '0' && currentRates.show_silver !== 0;
+  }
 
   form.addEventListener('submit', (e) => {
     e.preventDefault();
     const newRates = {
       gold_22k: parseFloat(document.getElementById('admin-rate-22k').value) || 7200,
       gold_24k: parseFloat(document.getElementById('admin-rate-24k').value) || 7850,
-      silver: parseFloat(document.getElementById('admin-rate-silver').value) || 92
+      silver: parseFloat(document.getElementById('admin-rate-silver').value) || 92,
+      show_gold_22k: document.getElementById('admin-show-22k') ? document.getElementById('admin-show-22k').checked : true,
+      show_gold_24k: document.getElementById('admin-show-24k') ? document.getElementById('admin-show-24k').checked : true,
+      show_silver: document.getElementById('admin-show-silver') ? document.getElementById('admin-show-silver').checked : true
     };
-
-    // Save ticker visibility settings
-    const newVisibility = {
-      show_22k: document.getElementById('admin-show-22k').checked,
-      show_24k: document.getElementById('admin-show-24k').checked,
-      show_silver: document.getElementById('admin-show-silver').checked
-    };
-    localStorage.setItem('rnj_ticker_visibility', JSON.stringify(newVisibility));
-
-    // Save visibility to Google Sheets Settings for storefront to read
-    if (CONFIG.APPS_SCRIPT_URL) {
-      const params = new URLSearchParams({
-        action: 'updateSettings',
-        'data[ticker_show_22k]': newVisibility.show_22k ? 'true' : 'false',
-        'data[ticker_show_24k]': newVisibility.show_24k ? 'true' : 'false',
-        'data[ticker_show_silver]': newVisibility.show_silver ? 'true' : 'false'
-      });
-      fetch(`${CONFIG.APPS_SCRIPT_URL}?${params.toString()}`).catch(() => {});
-    }
 
     API.setRates(newRates);
-    alert('✨ Rates & Ticker Visibility Updated! Changes are now live on your website.');
+    alert('✨ Rates & Storefront Ticker Visibility Updated Successfully!');
     renderAdminProductsTable();
     renderOverviewStats();
   });

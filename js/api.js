@@ -28,6 +28,9 @@ const API = {
         'data[gold_22k_rate]': updated.gold_22k,
         'data[gold_24k_rate]': updated.gold_24k,
         'data[silver_rate]': updated.silver,
+        'data[show_gold_22k]': (updated.show_gold_22k !== false && updated.show_gold_22k !== '0') ? '1' : '0',
+        'data[show_gold_24k]': (updated.show_gold_24k !== false && updated.show_gold_24k !== '0') ? '1' : '0',
+        'data[show_silver]': (updated.show_silver !== false && updated.show_silver !== '0') ? '1' : '0',
         'data[last_rate_update]': updated.last_updated
       });
       fetch(`${CONFIG.APPS_SCRIPT_URL}?${params.toString()}`)
@@ -79,6 +82,9 @@ const API = {
               gold_22k: parseFloat(setJson.data.gold_22k_rate),
               gold_24k: parseFloat(setJson.data.gold_24k_rate),
               silver: parseFloat(setJson.data.silver_rate),
+              show_gold_22k: setJson.data.show_gold_22k !== '0' && setJson.data.show_gold_22k !== false,
+              show_gold_24k: setJson.data.show_gold_24k !== '0' && setJson.data.show_gold_24k !== false,
+              show_silver: setJson.data.show_silver !== '0' && setJson.data.show_silver !== false,
               last_updated: setJson.data.last_rate_update || new Date().toISOString()
             };
             localStorage.setItem('rnj_rates', JSON.stringify(rates));
