@@ -153,8 +153,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 function initAdminDashboard() {
   renderOverviewStats();
   renderAdminProductsTable();
-  initRateForm();
-  initHomepageSettingsForm();
   initProductForm();
   renderEnquiriesTable();
   renderCustomOrdersTable();
@@ -162,6 +160,51 @@ function initAdminDashboard() {
   initBulkCSVImport();
   initNotificationForm();
   initNavigationTabs();
+
+  // Fetch live settings from Google Sheets first, then populate both forms
+  if (CONFIG.APPS_SCRIPT_URL) {
+    const nonce = `${Date.now()}_${Math.floor(Math.random()*99999)}`;
+    fetch(`${CONFIG.APPS_SCRIPT_URL}?action=getSettings&_nc=${nonce}`, {
+      cache: 'no-store',
+      headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate', 'Pragma': 'no-cache' }
+    })
+    .then(r => r.json())
+    .then(res => {
+      if (res.status === 'success' && res.data) {
+        const d = res.data;
+        const parseBool = (val, def) => (val === undefined || val === null || val === '') ? def : (val !== '0' && val !== 0 && val !== false && val !== 'false');
+        // Write fresh values into localStorage before form init
+        const currentRates = API.getRates();
+        const rates = {
+          gold_22k: parseFloat(d.gold_22k_rate) || currentRates.gold_22k,
+          gold_24k: parseFloat(d.gold_24k_rate) || currentRates.gold_24k,
+          silver: parseFloat(d.silver_rate) || currentRates.silver,
+          show_gold_22k: parseBool(d.show_gold_22k, currentRates.show_gold_22k !== false),
+          show_gold_24k: parseBool(d.show_gold_24k, currentRates.show_gold_24k !== false),
+          show_silver: parseBool(d.show_silver, currentRates.show_silver !== false),
+          last_updated: d.last_rate_update || currentRates.last_updated
+        };
+        localStorage.setItem('rnj_rates', JSON.stringify(rates));
+        const defaultText = '✨ Festive Silver Offer: Special 15% OFF on Making Charges for All Silver Ornaments!';
+        const siteSettings = {
+          promo_banner_text: (d.promo_banner_text && d.promo_banner_text.trim()) ? d.promo_banner_text : defaultText,
+          show_promo_banner: parseBool(d.show_promo_banner, true),
+          hero_bg_url: (d.hero_bg_url && d.hero_bg_url.trim()) ? d.hero_bg_url : 'assets/images/hero.jpg',
+          enable_particles: parseBool(d.enable_particles, true)
+        };
+        localStorage.setItem('rnj_site_settings', JSON.stringify(siteSettings));
+      }
+    })
+    .catch(() => {})
+    .finally(() => {
+      // Now init forms with up-to-date values
+      initRateForm();
+      initHomepageSettingsForm();
+    });
+  } else {
+    initRateForm();
+    initHomepageSettingsForm();
+  }
 
   // Background Auto-Refresh every 15 seconds for live enquiries, custom orders, appointments & visitor count
   setInterval(() => {
