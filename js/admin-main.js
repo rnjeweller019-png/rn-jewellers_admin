@@ -523,7 +523,7 @@ function renderEnquiriesTable() {
     fetch(`${CONFIG.APPS_SCRIPT_URL}?action=exportEnquiries&_t=${Date.now()}`, { cache: 'no-store' })
       .then(res => res.json())
       .then(res => {
-        if (res.status === 'success' && Array.isArray(res.data) && res.data.length > 0) {
+        if (res.status === 'success' && Array.isArray(res.data)) {
           localStorage.setItem('rnj_submitEnquiry', JSON.stringify(res.data));
           displayEnquiriesRows(res.data);
           const enquiriesCountEl = document.getElementById('stat-enquiries-count');
@@ -834,10 +834,10 @@ function renderAppointmentsTable() {
     tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; color:var(--gold-light); padding:40px;"><i class="fas fa-spinner fa-spin" style="font-size:2rem; display:block; margin-bottom:12px; color:var(--gold-primary);"></i>Syncing latest bookings with Google Sheets...</td></tr>';
   }
 
-  fetch(`${CONFIG.APPS_SCRIPT_URL}?action=exportAppointments`)
+  fetch(`${CONFIG.APPS_SCRIPT_URL}?action=exportAppointments&_t=${Date.now()}`, { cache: 'no-store' })
     .then(res => res.json())
     .then(res => {
-      if (res.status === 'success' && Array.isArray(res.data) && res.data.length > 0) {
+      if (res.status === 'success' && Array.isArray(res.data)) {
         localStorage.setItem('rnj_submitAppointment', JSON.stringify(res.data));
         displayAppointmentsRows(res.data);
       } else {
