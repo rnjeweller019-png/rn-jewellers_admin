@@ -126,6 +126,7 @@
         <li class="admin-menu-item"><a href="#products"><i class="fas fa-gem"></i> Manage Products</a></li>
         <li class="admin-menu-item"><a href="#pricing"><i class="fas fa-coins"></i> Gold & Silver Rates</a></li>
         <li class="admin-menu-item"><a href="#enquiries"><i class="fas fa-inbox"></i> Enquiries Inbox</a></li>
+        <li class="admin-menu-item"><a href="#custom-orders"><i class="fas fa-palette"></i> Custom Orders</a></li>
         <li class="admin-menu-item"><a href="#appointments"><i class="fas fa-calendar-check"></i> Showroom Appointments</a></li>
         <li class="admin-menu-item"><a href="#notifications"><i class="fas fa-bell"></i> Push Notifications</a></li>
         <li class="admin-menu-item"><a href="#bulk"><i class="fas fa-file-csv"></i> Bulk CSV Import</a></li>
@@ -511,6 +512,33 @@
           <p style="color:var(--text-muted); margin-bottom:20px;">Upload a CSV file containing columns: Name, Category, Metal, Purity, Weight, MakingCharge, Description, ImageURL.</p>
           <input type="file" id="csv-file-input" accept=".csv" style="display:none;">
           <button id="csv-import-btn" class="btn btn-primary"><i class="fas fa-file-upload"></i> Choose & Import CSV File</button>
+        </div>
+      </section>
+
+      <!-- SECTION 7: BESPOKE CUSTOM ORDERS -->
+      <section id="custom-orders" class="admin-section" style="display:none;">
+        <div class="table-card">
+          <div class="table-header" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+            <h2>Bespoke Custom Jewellery Orders</h2>
+            <button onclick="renderCustomOrdersTable()" class="btn btn-secondary btn-sm"><i class="fas fa-sync-alt"></i> Refresh Orders</button>
+          </div>
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Date Logged</th>
+                <th>Customer &amp; Contact</th>
+                <th>Jewellery Type</th>
+                <th>Metal &amp; Purity</th>
+                <th>Budget Range</th>
+                <th>Description &amp; Specifications</th>
+                <th>Sketch / Reference</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="custom-orders-tbody">
+              <!-- Rendered via JS -->
+            </tbody>
+          </table>
         </div>
       </section>
 

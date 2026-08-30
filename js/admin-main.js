@@ -156,15 +156,17 @@ function initAdminDashboard() {
   initRateForm();
   initProductForm();
   renderEnquiriesTable();
+  renderCustomOrdersTable();
   renderAppointmentsTable();
   initBulkCSVImport();
   initNotificationForm();
   initNavigationTabs();
 
-  // Background Auto-Refresh every 15 seconds for live enquiries, appointments & visitor count
+  // Background Auto-Refresh every 15 seconds for live enquiries, custom orders, appointments & visitor count
   setInterval(() => {
     renderOverviewStats();
     renderEnquiriesTable();
+    renderCustomOrdersTable();
     renderAppointmentsTable();
   }, 15000);
 }
@@ -571,6 +573,59 @@ function displayEnquiriesRows(enquiries) {
       </td>
     </tr>
   `).join('');
+}
+
+// 4B. BESPOKE CUSTOM ORDERS
+function renderCustomOrdersTable() {
+  const tbody = document.getElementById('custom-orders-tbody');
+  if (!tbody) return;
+
+  if (CONFIG.APPS_SCRIPT_URL) {
+    fetch(`${CONFIG.APPS_SCRIPT_URL}?action=exportCustomOrders&_t=${Date.now()}`, { cache: 'no-store' })
+      .then(res => res.json())
+      .then(res => {
+        if (res.status === 'success' && Array.isArray(res.data)) {
+          localStorage.setItem('rnj_submitCustomOrder', JSON.stringify(res.data));
+          displayCustomOrdersRows(res.data);
+        } else {
+          displayCustomOrdersRows(JSON.parse(localStorage.getItem('rnj_submitCustomOrder')) || []);
+        }
+      })
+      .catch(() => displayCustomOrdersRows(JSON.parse(localStorage.getItem('rnj_submitCustomOrder')) || []));
+  } else {
+    displayCustomOrdersRows(JSON.parse(localStorage.getItem('rnj_submitCustomOrder')) || []);
+  }
+}
+
+function displayCustomOrdersRows(orders) {
+  const tbody = document.getElementById('custom-orders-tbody');
+  if (!tbody) return;
+
+  if (!orders || orders.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; color:var(--text-muted); padding:30px;">No bespoke custom orders received yet.</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = orders.map(o => {
+    const hasImg = o.reference_image_url && String(o.reference_image_url).trim() !== '';
+    const imgHtml = hasImg ? `<a href="${escapeHtml(o.reference_image_url)}" target="_blank"><img src="${escapeHtml(o.reference_image_url)}" style="width:45px; height:45px; object-fit:cover; border-radius:6px; border:1px solid var(--border-gold);" alt="Sketch"></a>` : '<span style="color:var(--text-muted); font-size:0.75rem;">No Sketch</span>';
+    const waText = encodeURIComponent(`Hello ${o.name || ''}, thank you for your custom jewellery order request (${o.type || 'Jewellery'} in ${o.metal || 'Silver/Gold'}). We reviewed your request!`);
+
+    return `
+      <tr>
+        <td><span style="font-size:0.82rem; color:var(--text-muted);">${o.timestamp ? new Date(o.timestamp).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : 'N/A'}</span></td>
+        <td><strong>${escapeHtml(o.name)}</strong><br><span style="color:var(--text-muted); font-size:0.8rem;">${escapeHtml(o.phone)}</span></td>
+        <td><span class="badge badge-featured" style="font-size:0.75rem;">${escapeHtml(o.type || 'Custom')}</span></td>
+        <td><strong style="color:var(--gold-light); font-size:0.85rem;">${escapeHtml(o.metal || 'Pure Silver')}</strong></td>
+        <td><span style="color:#2ecc71; font-weight:600; font-size:0.85rem;">${escapeHtml(o.budget || 'Open')}</span></td>
+        <td style="max-width:220px; font-size:0.82rem; color:var(--text-muted);">${escapeHtml(o.description || 'No specs provided.')}</td>
+        <td>${imgHtml}</td>
+        <td>
+          <a href="https://wa.me/${escapeHtml(String(o.phone || '').replace(/[^0-9]/g, ''))}?text=${waText}" target="_blank" class="btn btn-whatsapp btn-sm" style="padding:4px 8px; font-size:0.75rem;"><i class="fab fa-whatsapp"></i> Chat Order</a>
+        </td>
+      </tr>
+    `;
+  }).join('');
 }
 
 // 5. BULK CSV IMPORT

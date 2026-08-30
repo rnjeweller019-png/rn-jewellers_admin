@@ -78,13 +78,18 @@ const API = {
         .then(res => res.json())
         .then(setJson => {
           if (setJson.status === 'success' && setJson.data && setJson.data.gold_22k_rate) {
+            const currentRates = this.getRates();
+            const parseBool = (val, defaultVal) => {
+              if (val === undefined || val === null || val === '') return defaultVal;
+              return val !== '0' && val !== 0 && val !== false && val !== 'false';
+            };
             const rates = {
-              gold_22k: parseFloat(setJson.data.gold_22k_rate),
-              gold_24k: parseFloat(setJson.data.gold_24k_rate),
-              silver: parseFloat(setJson.data.silver_rate),
-              show_gold_22k: setJson.data.show_gold_22k !== '0' && setJson.data.show_gold_22k !== false,
-              show_gold_24k: setJson.data.show_gold_24k !== '0' && setJson.data.show_gold_24k !== false,
-              show_silver: setJson.data.show_silver !== '0' && setJson.data.show_silver !== false,
+              gold_22k: parseFloat(setJson.data.gold_22k_rate) || currentRates.gold_22k,
+              gold_24k: parseFloat(setJson.data.gold_24k_rate) || currentRates.gold_24k,
+              silver: parseFloat(setJson.data.silver_rate) || currentRates.silver,
+              show_gold_22k: parseBool(setJson.data.show_gold_22k, currentRates.show_gold_22k !== false),
+              show_gold_24k: parseBool(setJson.data.show_gold_24k, currentRates.show_gold_24k !== false),
+              show_silver: parseBool(setJson.data.show_silver, currentRates.show_silver !== false),
               last_updated: setJson.data.last_rate_update || new Date().toISOString()
             };
             localStorage.setItem('rnj_rates', JSON.stringify(rates));
@@ -107,7 +112,15 @@ const API = {
           }
         }).catch(() => {});
 
-      await Promise.all([prodPromise, setPromise, enqPromise, aptPromise]);
+      const customOrderPromise = fetch(`${CONFIG.APPS_SCRIPT_URL}?action=exportCustomOrders&_t=${Date.now()}`, { cache: 'no-store' })
+        .then(res => res.json())
+        .then(json => {
+          if (json.status === 'success' && Array.isArray(json.data)) {
+            localStorage.setItem('rnj_submitCustomOrder', JSON.stringify(json.data));
+          }
+        }).catch(() => {});
+
+      await Promise.all([prodPromise, setPromise, enqPromise, aptPromise, customOrderPromise]);
     } catch (err) {
       console.log('Server sync error:', err);
     }
