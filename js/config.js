@@ -12,7 +12,7 @@ const CONFIG = {
   // Shop Core Details
   SHOP: {
     name: "RN Jewellers",
-    tagline: "Timeless Elegance & Certified Purity Since 1985",
+    tagline: "Timeless Elegance & Certified Purity",
     phone: "+91 87088 53335",
     whatsapp: "918708853335",
     email: "contact@rnjewellers.com",
