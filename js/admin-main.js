@@ -499,6 +499,12 @@ function initRateForm() {
   document.getElementById('admin-rate-24k').value = currentRates.gold_24k;
   document.getElementById('admin-rate-silver').value = currentRates.silver;
 
+  // Load saved ticker visibility from localStorage
+  const visibility = JSON.parse(localStorage.getItem('rnj_ticker_visibility') || '{"show_22k":true,"show_24k":true,"show_silver":true}');
+  document.getElementById('admin-show-22k').checked = visibility.show_22k !== false;
+  document.getElementById('admin-show-24k').checked = visibility.show_24k !== false;
+  document.getElementById('admin-show-silver').checked = visibility.show_silver !== false;
+
   form.addEventListener('submit', (e) => {
     e.preventDefault();
     const newRates = {
@@ -507,8 +513,27 @@ function initRateForm() {
       silver: parseFloat(document.getElementById('admin-rate-silver').value) || 92
     };
 
+    // Save ticker visibility settings
+    const newVisibility = {
+      show_22k: document.getElementById('admin-show-22k').checked,
+      show_24k: document.getElementById('admin-show-24k').checked,
+      show_silver: document.getElementById('admin-show-silver').checked
+    };
+    localStorage.setItem('rnj_ticker_visibility', JSON.stringify(newVisibility));
+
+    // Save visibility to Google Sheets Settings for storefront to read
+    if (CONFIG.APPS_SCRIPT_URL) {
+      const params = new URLSearchParams({
+        action: 'updateSettings',
+        'data[ticker_show_22k]': newVisibility.show_22k ? 'true' : 'false',
+        'data[ticker_show_24k]': newVisibility.show_24k ? 'true' : 'false',
+        'data[ticker_show_silver]': newVisibility.show_silver ? 'true' : 'false'
+      });
+      fetch(`${CONFIG.APPS_SCRIPT_URL}?${params.toString()}`).catch(() => {});
+    }
+
     API.setRates(newRates);
-    alert('✨ Gold & Silver Rates Updated! Entire product catalog prices recalculated.');
+    alert('✨ Rates & Ticker Visibility Updated! Changes are now live on your website.');
     renderAdminProductsTable();
     renderOverviewStats();
   });
