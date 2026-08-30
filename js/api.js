@@ -35,22 +35,40 @@ const API = {
     localStorage.setItem('rnj_site_settings', JSON.stringify(updated));
 
     if (CONFIG.APPS_SCRIPT_URL) {
-      const params = new URLSearchParams({
+      const payload = {
         action: 'updateSettings',
-        'data[promo_banner_text]': updated.promo_banner_text,
-        'data[show_promo_banner]': updated.show_promo_banner ? '1' : '0',
-        'data[hero_bg_url]': updated.hero_bg_url,
-        'data[enable_particles]': updated.enable_particles ? '1' : '0',
-        'data[last_settings_update]': updated.last_updated
+        data: {
+          promo_banner_text: updated.promo_banner_text,
+          show_promo_banner: updated.show_promo_banner ? '1' : '0',
+          hero_bg_url: updated.hero_bg_url,
+          enable_particles: updated.enable_particles ? '1' : '0',
+          last_settings_update: updated.last_updated
+        }
+      };
+
+      fetch(CONFIG.APPS_SCRIPT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify(payload)
+      })
+      .then(r => r.json())
+      .then(r => console.log('Site settings saved to Sheets:', r.message))
+      .catch(err => {
+        // Fallback: If POST fails, strip heavy hero_bg_url if base64 and fire GET query
+        const cleanData = { ...payload.data };
+        if (cleanData.hero_bg_url && cleanData.hero_bg_url.startsWith('data:image')) {
+          cleanData.hero_bg_url = 'assets/images/hero.jpg';
+        }
+        const params = new URLSearchParams();
+        params.append('action', 'updateSettings');
+        Object.keys(cleanData).forEach(k => params.append(`data[${k}]`, cleanData[k]));
+        fetch(`${CONFIG.APPS_SCRIPT_URL}?${params.toString()}`).catch(() => {});
       });
-      fetch(`${CONFIG.APPS_SCRIPT_URL}?${params.toString()}`)
-        .then(r => r.json())
-        .catch(err => console.log('Sync err:', err));
     }
     return updated;
   },
 
-  // Save/Update Rates — push to Google Sheets via query params (no CORS preflight)
+  // Save/Update Rates — push to Google Sheets via POST
   setRates(rates) {
     const updated = {
       ...this.getRates(),
@@ -59,22 +77,33 @@ const API = {
     };
     localStorage.setItem('rnj_rates', JSON.stringify(updated));
 
-    // Push to Google Sheets using GET query params to avoid CORS preflight
     if (CONFIG.APPS_SCRIPT_URL) {
-      const params = new URLSearchParams({
+      const payload = {
         action: 'updateSettings',
-        'data[gold_22k_rate]': updated.gold_22k,
-        'data[gold_24k_rate]': updated.gold_24k,
-        'data[silver_rate]': updated.silver,
-        'data[show_gold_22k]': (updated.show_gold_22k !== false && updated.show_gold_22k !== '0') ? '1' : '0',
-        'data[show_gold_24k]': (updated.show_gold_24k !== false && updated.show_gold_24k !== '0') ? '1' : '0',
-        'data[show_silver]': (updated.show_silver !== false && updated.show_silver !== '0') ? '1' : '0',
-        'data[last_rate_update]': updated.last_updated
+        data: {
+          gold_22k_rate: String(updated.gold_22k),
+          gold_24k_rate: String(updated.gold_24k),
+          silver_rate: String(updated.silver),
+          show_gold_22k: (updated.show_gold_22k !== false && updated.show_gold_22k !== '0') ? '1' : '0',
+          show_gold_24k: (updated.show_gold_24k !== false && updated.show_gold_24k !== '0') ? '1' : '0',
+          show_silver: (updated.show_silver !== false && updated.show_silver !== '0') ? '1' : '0',
+          last_rate_update: updated.last_updated
+        }
+      };
+
+      fetch(CONFIG.APPS_SCRIPT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify(payload)
+      })
+      .then(r => r.json())
+      .then(r => console.log('Rates saved to Sheets:', r.message))
+      .catch(err => {
+        const params = new URLSearchParams();
+        params.append('action', 'updateSettings');
+        Object.keys(payload.data).forEach(k => params.append(`data[${k}]`, payload.data[k]));
+        fetch(`${CONFIG.APPS_SCRIPT_URL}?${params.toString()}`).catch(() => {});
       });
-      fetch(`${CONFIG.APPS_SCRIPT_URL}?${params.toString()}`)
-        .then(r => r.json())
-        .then(r => console.log('Rates saved to Sheets:', r.message))
-        .catch(err => console.log('Rate sync error:', err));
     }
 
     return updated;
