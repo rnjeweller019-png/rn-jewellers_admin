@@ -401,7 +401,9 @@ const API = {
 
     if (CONFIG.APPS_SCRIPT_URL) {
       const payload = encodeURIComponent(JSON.stringify(productData));
+      const nowIso = new Date().toISOString();
       fetch(`${CONFIG.APPS_SCRIPT_URL}?action=saveProduct&data=${payload}`).catch(e => console.log(e));
+      fetch(`${CONFIG.APPS_SCRIPT_URL}?action=updateSettings&data%5Blast_settings_update%5D=${nowIso}`).catch(e => console.log(e));
     }
 
     return productData;
@@ -414,7 +416,9 @@ const API = {
     localStorage.setItem('rnj_products', JSON.stringify(products));
 
     if (CONFIG.APPS_SCRIPT_URL) {
+      const nowIso = new Date().toISOString();
       fetch(`${CONFIG.APPS_SCRIPT_URL}?action=deleteProduct&id=${id}`).catch(e => console.log(e));
+      fetch(`${CONFIG.APPS_SCRIPT_URL}?action=updateSettings&data%5Blast_settings_update%5D=${nowIso}`).catch(e => console.log(e));
     }
   },
 
