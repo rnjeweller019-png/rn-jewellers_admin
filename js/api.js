@@ -12,6 +12,44 @@ const API = {
     return CONFIG.DEFAULT_RATES;
   },
 
+  // Get Site Settings (promo text, show_promo, hero_bg_url, enable_particles, etc)
+  getSiteSettings() {
+    const stored = localStorage.getItem('rnj_site_settings');
+    if (stored) {
+      try { return JSON.parse(stored); } catch(e) {}
+    }
+    return {
+      promo_banner_text: "✨ Festive Offer: Special 15% OFF on Making Charges for All Pure Silver Collections!",
+      show_promo_banner: true,
+      hero_bg_url: "assets/images/hero.jpg",
+      enable_particles: true
+    };
+  },
+
+  saveSiteSettings(settings) {
+    const updated = {
+      ...this.getSiteSettings(),
+      ...settings,
+      last_updated: new Date().toISOString()
+    };
+    localStorage.setItem('rnj_site_settings', JSON.stringify(updated));
+
+    if (CONFIG.APPS_SCRIPT_URL) {
+      const params = new URLSearchParams({
+        action: 'updateSettings',
+        'data[promo_banner_text]': updated.promo_banner_text,
+        'data[show_promo_banner]': updated.show_promo_banner ? '1' : '0',
+        'data[hero_bg_url]': updated.hero_bg_url,
+        'data[enable_particles]': updated.enable_particles ? '1' : '0',
+        'data[last_settings_update]': updated.last_updated
+      });
+      fetch(`${CONFIG.APPS_SCRIPT_URL}?${params.toString()}`)
+        .then(r => r.json())
+        .catch(err => console.log('Sync err:', err));
+    }
+    return updated;
+  },
+
   // Save/Update Rates — push to Google Sheets via query params (no CORS preflight)
   setRates(rates) {
     const updated = {
@@ -77,7 +115,7 @@ const API = {
       const setPromise = fetch(`${CONFIG.APPS_SCRIPT_URL}?action=getSettings&_t=${Date.now()}`, { cache: 'no-store' })
         .then(res => res.json())
         .then(setJson => {
-          if (setJson.status === 'success' && setJson.data && setJson.data.gold_22k_rate) {
+          if (setJson.status === 'success' && setJson.data) {
             const currentRates = this.getRates();
             const parseBool = (val, defaultVal) => {
               if (val === undefined || val === null || val === '') return defaultVal;
@@ -93,6 +131,15 @@ const API = {
               last_updated: setJson.data.last_rate_update || new Date().toISOString()
             };
             localStorage.setItem('rnj_rates', JSON.stringify(rates));
+
+            const currentSettings = this.getSiteSettings();
+            const siteSettings = {
+              promo_banner_text: setJson.data.promo_banner_text || currentSettings.promo_banner_text || "✨ Festive Offer: Special 15% OFF on Making Charges for All Pure Silver Collections!",
+              show_promo_banner: parseBool(setJson.data.show_promo_banner, currentSettings.show_promo_banner !== false),
+              hero_bg_url: setJson.data.hero_bg_url || currentSettings.hero_bg_url || "assets/images/hero.jpg",
+              enable_particles: parseBool(setJson.data.enable_particles, currentSettings.enable_particles !== false)
+            };
+            localStorage.setItem('rnj_site_settings', JSON.stringify(siteSettings));
           }
         }).catch(e => console.log('Settings sync error:', e));
 

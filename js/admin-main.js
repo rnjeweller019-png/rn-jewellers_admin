@@ -154,6 +154,7 @@ function initAdminDashboard() {
   renderOverviewStats();
   renderAdminProductsTable();
   initRateForm();
+  initHomepageSettingsForm();
   initProductForm();
   renderEnquiriesTable();
   renderCustomOrdersTable();
@@ -526,6 +527,79 @@ function initRateForm() {
     alert('✨ Rates & Storefront Ticker Visibility Updated Successfully!');
     renderAdminProductsTable();
     renderOverviewStats();
+  });
+}
+
+function initHomepageSettingsForm() {
+  const form = document.getElementById('admin-homepage-form');
+  if (!form) return;
+
+  const currentSettings = API.getSiteSettings();
+  const promoInput = document.getElementById('admin-promo-text');
+  const promoShow = document.getElementById('admin-show-promo');
+  const heroBgInput = document.getElementById('admin-hero-bg');
+  const heroFileBtn = document.getElementById('admin-upload-hero-btn');
+  const heroFileInput = document.getElementById('admin-hero-bg-file');
+  const heroPreview = document.getElementById('hero-bg-preview');
+  const heroPreviewBox = document.getElementById('hero-bg-preview-box');
+  const enableParticles = document.getElementById('admin-enable-particles');
+
+  if (promoInput) promoInput.value = currentSettings.promo_banner_text || '';
+  if (promoShow) promoShow.checked = currentSettings.show_promo_banner !== false && currentSettings.show_promo_banner !== '0';
+  if (heroBgInput) heroBgInput.value = currentSettings.hero_bg_url || 'assets/images/hero.jpg';
+  if (enableParticles) enableParticles.checked = currentSettings.enable_particles !== false && currentSettings.enable_particles !== '0';
+
+  if (heroBgInput && heroBgInput.value && heroPreview) {
+    heroPreview.src = heroBgInput.value;
+    if (heroPreviewBox) heroPreviewBox.style.display = 'block';
+  }
+
+  if (heroFileBtn && heroFileInput) {
+    heroFileBtn.addEventListener('click', () => heroFileInput.click());
+    heroFileInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (evt) => {
+          const img = new Image();
+          img.onload = () => {
+            const canvas = document.createElement('canvas');
+            const MAX_WIDTH = 1200;
+            const MAX_HEIGHT = 1200;
+            let width = img.width;
+            let height = img.height;
+            if (width > height) {
+              if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; }
+            } else {
+              if (height > MAX_HEIGHT) { width *= MAX_HEIGHT / height; height = MAX_HEIGHT; }
+            }
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, width, height);
+            const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
+            if (heroBgInput) heroBgInput.value = dataUrl;
+            if (heroPreview) heroPreview.src = dataUrl;
+            if (heroPreviewBox) heroPreviewBox.style.display = 'block';
+          };
+          img.src = evt.target.result;
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+  }
+
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const newSettings = {
+      promo_banner_text: document.getElementById('admin-promo-text').value,
+      show_promo_banner: document.getElementById('admin-show-promo').checked,
+      hero_bg_url: document.getElementById('admin-hero-bg').value || 'assets/images/hero.jpg',
+      enable_particles: document.getElementById('admin-enable-particles').checked
+    };
+
+    API.saveSiteSettings(newSettings);
+    alert('✨ Homepage Banner, Hero Image & Animation Settings Saved Successfully!');
   });
 }
 
