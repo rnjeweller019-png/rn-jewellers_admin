@@ -745,29 +745,67 @@ function initBulkCSVImport() {
   });
 }
 
-function parseAndImportCSV(csvText) {
-  const lines = csvText.split('\n');
-  if (lines.length <= 1) return;
-
-  let count = 0;
-  for (let i = 1; i < lines.length; i++) {
-    const cols = lines[i].split(',');
-    if (cols.length >= 4) {
-      API.saveProduct({
-        name: cols[0].trim(),
-        category: cols[1].trim() || 'rings',
-        metal: cols[2].trim() || 'gold',
-        purity: cols[3].trim() || '22K',
-        weight_g: parseFloat(cols[4]) || 10,
-        making_charge: parseFloat(cols[5]) || 2000,
-        description: cols[6] ? cols[6].trim() : 'Fine crafted jewellery.',
-        image_urls: cols[7] ? [cols[7].trim()] : ['../assets/images/ring_1.jpg']
-      });
-      count++;
+function parseCSVLine(line) {
+  const result = [];
+  let current = '';
+  let inQuotes = false;
+  for (let i = 0; i < line.length; i++) {
+    const ch = line[i];
+    if (ch === '"') {
+      if (inQuotes && line[i + 1] === '"') { current += '"'; i++; }
+      else { inQuotes = !inQuotes; }
+    } else if (ch === ',' && !inQuotes) {
+      result.push(current.trim());
+      current = '';
+    } else {
+      current += ch;
     }
   }
+  result.push(current.trim());
+  return result;
+}
 
-  alert(`Successfully imported ${count} products from CSV!`);
+function parseAndImportCSV(csvText) {
+  const lines = csvText.split('\n').filter(l => l.trim().length > 0);
+  if (lines.length <= 1) { alert('CSV file is empty or has no data rows.'); return; }
+
+  // Expected columns (row 0 = header, skip it):
+  // Name, Category, Metal, Purity, Weight(g), Making Charge, Description, Image URL
+  let count = 0;
+  for (let i = 1; i < lines.length; i++) {
+    const cols = parseCSVLine(lines[i]);
+    if (cols.length < 1 || !cols[0]) continue; // skip empty rows
+
+    const name = cols[0] || '';
+    const category = (cols[1] || 'rings').toLowerCase().trim();
+    const metal = (cols[2] || 'silver').toLowerCase().trim();
+    const purity = cols[3] || '92.5';
+    const weight = parseFloat(cols[4]) || 10;
+    const makingCharge = parseFloat(cols[5]) || 0;
+    const description = cols[6] || 'Fine crafted jewellery.';
+    const imageUrl = cols[7] || '';
+
+    API.saveProduct({
+      name,
+      category,
+      metal,
+      purity,
+      weight_g: weight,
+      making_charge: makingCharge,
+      making_type: 'fixed',
+      description,
+      image_urls: imageUrl ? [imageUrl] : [],
+      is_featured: false,
+      is_new_arrival: false,
+      is_best_seller: false,
+      is_limited_stock: false,
+      is_sold_out: false,
+      product_discount: 0
+    });
+    count++;
+  }
+
+  alert(`✅ Successfully imported ${count} product${count !== 1 ? 's' : ''} from CSV!`);
   renderAdminProductsTable();
   renderOverviewStats();
 }

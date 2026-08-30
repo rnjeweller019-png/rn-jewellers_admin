@@ -548,13 +548,36 @@
 
       <!-- SECTION 6: BULK CSV IMPORT -->
       <section id="bulk" class="admin-section" style="display:none;">
-        <div class="table-card" style="max-width:650px;">
+        <div class="table-card" style="max-width:720px;">
           <div class="table-header">
             <h2>Bulk Product CSV Import</h2>
           </div>
-          <p style="color:var(--text-muted); margin-bottom:20px;">Upload a CSV file containing columns: Name, Category, Metal, Purity, Weight, MakingCharge, Description, ImageURL.</p>
+          <p style="color:var(--text-muted); margin-bottom:16px;">Upload a <code>.csv</code> file with the following <strong>8 columns in this exact order</strong>. Row 1 must be the header (it will be skipped).</p>
+          <div style="background:var(--surface-2); border:1px solid var(--border); border-radius:8px; padding:16px; margin-bottom:20px; overflow-x:auto;">
+            <table style="width:100%; border-collapse:collapse; font-size:0.82rem;">
+              <thead>
+                <tr style="color:var(--gold-primary);">
+                  <th style="padding:6px 10px; text-align:left; border-bottom:1px solid var(--border);">#</th>
+                  <th style="padding:6px 10px; text-align:left; border-bottom:1px solid var(--border);">Column</th>
+                  <th style="padding:6px 10px; text-align:left; border-bottom:1px solid var(--border);">Example</th>
+                  <th style="padding:6px 10px; text-align:left; border-bottom:1px solid var(--border);">Notes</th>
+                </tr>
+              </thead>
+              <tbody style="color:var(--text-muted);">
+                <tr><td style="padding:5px 10px;">1</td><td style="padding:5px 10px;">Name</td><td style="padding:5px 10px;">Silver Anklet</td><td style="padding:5px 10px;">Product name</td></tr>
+                <tr><td style="padding:5px 10px;">2</td><td style="padding:5px 10px;">Category</td><td style="padding:5px 10px;">payals</td><td style="padding:5px 10px;">rings / necklaces / earrings / bangles / payals / chains</td></tr>
+                <tr><td style="padding:5px 10px;">3</td><td style="padding:5px 10px;">Metal</td><td style="padding:5px 10px;">silver</td><td style="padding:5px 10px;">silver / gold</td></tr>
+                <tr><td style="padding:5px 10px;">4</td><td style="padding:5px 10px;">Purity</td><td style="padding:5px 10px;">92.5</td><td style="padding:5px 10px;">e.g. 92.5 / 999 / 22K / 18K</td></tr>
+                <tr><td style="padding:5px 10px;">5</td><td style="padding:5px 10px;">Weight (g)</td><td style="padding:5px 10px;">15</td><td style="padding:5px 10px;">Weight in grams (number only)</td></tr>
+                <tr><td style="padding:5px 10px;">6</td><td style="padding:5px 10px;">Making Charge</td><td style="padding:5px 10px;">500</td><td style="padding:5px 10px;">Fixed rupees amount</td></tr>
+                <tr><td style="padding:5px 10px;">7</td><td style="padding:5px 10px;">Description</td><td style="padding:5px 10px;">"Handcrafted, lightweight anklet"</td><td style="padding:5px 10px;">Wrap in quotes if it contains commas</td></tr>
+                <tr><td style="padding:5px 10px;">8</td><td style="padding:5px 10px;">Image URL</td><td style="padding:5px 10px;">https://drive.google.com/...</td><td style="padding:5px 10px;">Full URL, leave empty if none</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p style="color:var(--text-muted); font-size:0.82rem; margin-bottom:20px;"><strong>Example row:</strong> <code>Silver Anklet,payals,silver,92.5,15,500,"Handcrafted, lightweight anklet",https://...</code></p>
           <input type="file" id="csv-file-input" accept=".csv" style="display:none;">
-          <button id="csv-import-btn" class="btn btn-primary"><i class="fas fa-file-upload"></i> Choose & Import CSV File</button>
+          <button id="csv-import-btn" class="btn btn-primary"><i class="fas fa-file-upload"></i> Choose &amp; Import CSV File</button>
         </div>
       </section>
 
@@ -589,8 +612,8 @@
   </div>
 
   <!-- SCRIPTS -->
-  <script src="js/config.js?v=1.1.8"></script>
-  <script src="js/api.js?v=1.1.8"></script>
-  <script src="js/admin-main.js?v=1.1.8"></script>
+  <script src="js/config.js?v=1.1.9"></script>
+  <script src="js/api.js?v=1.1.9"></script>
+  <script src="js/admin-main.js?v=1.1.9"></script>
 </body>
 </html>
