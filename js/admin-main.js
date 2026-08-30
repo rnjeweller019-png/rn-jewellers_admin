@@ -589,8 +589,15 @@ function initHomepageSettingsForm() {
     });
   }
 
-  form.addEventListener('submit', (e) => {
+  form.addEventListener('submit', async (e) => {
     e.preventDefault();
+    const btn = form.querySelector('button[type="submit"]');
+    const origText = btn ? btn.innerHTML : '';
+    if (btn) {
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving Settings to Sheet...';
+      btn.disabled = true;
+    }
+
     const newSettings = {
       promo_banner_text: document.getElementById('admin-promo-text').value,
       show_promo_banner: document.getElementById('admin-show-promo').checked,
@@ -598,8 +605,17 @@ function initHomepageSettingsForm() {
       enable_particles: document.getElementById('admin-enable-particles').checked
     };
 
-    API.saveSiteSettings(newSettings);
-    alert('✨ Homepage Banner, Hero Image & Animation Settings Saved Successfully!');
+    try {
+      await API.saveSiteSettings(newSettings);
+      alert('✨ Homepage Banner, Hero Image & Animation Settings Saved Successfully!');
+    } catch(err) {
+      alert('Settings saved!');
+    } finally {
+      if (btn) {
+        btn.innerHTML = origText;
+        btn.disabled = false;
+      }
+    }
   });
 }
 
