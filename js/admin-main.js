@@ -569,7 +569,10 @@ function displayEnquiriesRows(enquiries) {
       <td>${escapeHtml(e.product_name || 'General')}</td>
       <td>${escapeHtml(e.message)}</td>
       <td>
-        <a href="https://wa.me/${escapeHtml(String(e.phone || '').replace(/[^0-9]/g, ''))}?text=${encodeURIComponent('Hello ' + (e.name || '') + ', thank you for contacting RN Jewellers regarding ' + (e.product_name || 'jewellery') + '. How can we assist you?')}" target="_blank" class="btn btn-whatsapp btn-sm" style="padding:4px 8px; font-size:0.75rem;"><i class="fab fa-whatsapp"></i> Reply</a>
+        <div style="display:flex; gap:6px; flex-wrap:wrap;">
+          <a href="https://wa.me/${escapeHtml(String(e.phone || '').replace(/[^0-9]/g, ''))}?text=${encodeURIComponent('Hello ' + (e.name || '') + ', thank you for contacting RN Jewellers regarding ' + (e.product_name || 'jewellery') + '. How can we assist you?')}" target="_blank" class="btn btn-whatsapp btn-sm" style="padding:4px 8px; font-size:0.75rem;"><i class="fab fa-whatsapp"></i> Reply</a>
+          <button onclick="deleteEnquiry('${escapeHtml(String(e.id || ''))}')" class="btn btn-secondary btn-sm" style="padding:4px 8px; font-size:0.75rem; color:#e74c3c; border-color:#e74c3c;"><i class="fas fa-trash"></i> Delete</button>
+        </div>
       </td>
     </tr>
   `).join('');
@@ -621,7 +624,10 @@ function displayCustomOrdersRows(orders) {
         <td style="max-width:220px; font-size:0.82rem; color:var(--text-muted);">${escapeHtml(o.description || 'No specs provided.')}</td>
         <td>${imgHtml}</td>
         <td>
-          <a href="https://wa.me/${escapeHtml(String(o.phone || '').replace(/[^0-9]/g, ''))}?text=${waText}" target="_blank" class="btn btn-whatsapp btn-sm" style="padding:4px 8px; font-size:0.75rem;"><i class="fab fa-whatsapp"></i> Chat Order</a>
+          <div style="display:flex; gap:6px; flex-wrap:wrap;">
+            <a href="https://wa.me/${escapeHtml(String(o.phone || '').replace(/[^0-9]/g, ''))}?text=${waText}" target="_blank" class="btn btn-whatsapp btn-sm" style="padding:4px 8px; font-size:0.75rem;"><i class="fab fa-whatsapp"></i> Chat Order</a>
+            <button onclick="deleteCustomOrder('${escapeHtml(String(o.id || ''))}')" class="btn btn-secondary btn-sm" style="padding:4px 8px; font-size:0.75rem; color:#e74c3c; border-color:#e74c3c;"><i class="fas fa-trash"></i> Delete</button>
+          </div>
         </td>
       </tr>
     `;
@@ -1038,6 +1044,34 @@ function deleteAppointment(id) {
   }
 
   renderAppointmentsTable();
+}
+
+function deleteEnquiry(id) {
+  if (!confirm('Delete this customer enquiry permanently?')) return;
+
+  let enquiries = JSON.parse(localStorage.getItem('rnj_submitEnquiry')) || [];
+  enquiries = enquiries.filter(e => e.id !== id);
+  localStorage.setItem('rnj_submitEnquiry', JSON.stringify(enquiries));
+
+  if (CONFIG.APPS_SCRIPT_URL) {
+    fetch(`${CONFIG.APPS_SCRIPT_URL}?action=deleteEnquiry&id=${id}`).catch(e => console.log(e));
+  }
+
+  renderEnquiriesTable();
+}
+
+function deleteCustomOrder(id) {
+  if (!confirm('Delete this custom order request permanently?')) return;
+
+  let orders = JSON.parse(localStorage.getItem('rnj_submitCustomOrder')) || [];
+  orders = orders.filter(o => o.id !== id);
+  localStorage.setItem('rnj_submitCustomOrder', JSON.stringify(orders));
+
+  if (CONFIG.APPS_SCRIPT_URL) {
+    fetch(`${CONFIG.APPS_SCRIPT_URL}?action=deleteCustomOrder&id=${id}`).catch(e => console.log(e));
+  }
+
+  renderCustomOrdersTable();
 }
 
 function escapeJsStr(str) {
