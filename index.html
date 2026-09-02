@@ -129,6 +129,7 @@
         <li class="admin-menu-item"><a href="#custom-orders"><i class="fas fa-palette"></i> Custom Orders</a></li>
         <li class="admin-menu-item"><a href="#appointments"><i class="fas fa-calendar-check"></i> Showroom Appointments</a></li>
         <li class="admin-menu-item"><a href="#notifications"><i class="fas fa-bell"></i> Push Notifications</a></li>
+        <li class="admin-menu-item"><a href="#theme"><i class="fas fa-paint-brush"></i> Site Theme</a></li>
         <li class="admin-menu-item"><a href="#bulk"><i class="fas fa-file-csv"></i> Bulk CSV Import</a></li>
       </ul>
 
@@ -546,6 +547,115 @@
         </div>
       </section>
 
+
+      <!-- SECTION: SITE THEME CUSTOMIZER -->
+      <section id="theme" class="admin-section" style="display:none;">
+        <div class="table-card" style="max-width:780px;">
+          <div class="table-header">
+            <h2><i class="fas fa-paint-brush" style="color:var(--gold-primary); margin-right:10px;"></i>Site Theme Customizer</h2>
+          </div>
+          <p style="color:var(--text-muted); margin-bottom:20px;">Changes apply to the live storefront for <strong>all visitors</strong> instantly after saving.</p>
+
+          <!-- PRESET THEMES -->
+          <div style="margin-bottom:28px;">
+            <div style="font-weight:600; margin-bottom:12px; font-size:0.9rem;">⚡ Quick Preset Themes</div>
+            <div style="display:flex; flex-wrap:wrap; gap:10px;">
+              <button onclick="applyPresetTheme('dark_gold')" style="padding:8px 16px; border-radius:8px; border:2px solid #c9a84c; background:linear-gradient(135deg,#080808,#1a1a1a); color:#c9a84c; cursor:pointer; font-weight:600; font-size:0.82rem;">🌑 Dark Gold (Default)</button>
+              <button onclick="applyPresetTheme('ivory_light')" style="padding:8px 16px; border-radius:8px; border:2px solid #b8860b; background:linear-gradient(135deg,#faf6f0,#f0e8d8); color:#5c3d00; cursor:pointer; font-weight:600; font-size:0.82rem;">☀️ Ivory Light</button>
+              <button onclick="applyPresetTheme('midnight_blue')" style="padding:8px 16px; border-radius:8px; border:2px solid #4a90d9; background:linear-gradient(135deg,#0a0f1e,#0d1b3e); color:#4a90d9; cursor:pointer; font-weight:600; font-size:0.82rem;">🌊 Midnight Blue</button>
+              <button onclick="applyPresetTheme('rose_gold')" style="padding:8px 16px; border-radius:8px; border:2px solid #b76e79; background:linear-gradient(135deg,#1a0a0f,#2a1018); color:#b76e79; cursor:pointer; font-weight:600; font-size:0.82rem;">🌸 Rose Gold</button>
+            </div>
+          </div>
+
+          <!-- LIVE PREVIEW BAR -->
+          <div id="theme-preview-bar" style="border-radius:10px; padding:18px 22px; margin-bottom:24px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; transition:all 0.3s; background:#080808; border:1px solid rgba(201,168,76,0.3);">
+            <div style="display:flex; align-items:center; gap:12px;">
+              <div id="preview-logo" style="width:36px; height:36px; border-radius:50%; background:linear-gradient(135deg,#c9a84c,#f5d77f); display:flex; align-items:center; justify-content:center; font-size:1rem;">💎</div>
+              <div>
+                <div id="preview-brand" style="font-weight:700; font-size:0.95rem; color:#c9a84c; letter-spacing:1px;">RN JEWELLERS</div>
+                <div id="preview-sub" style="font-size:0.7rem; color:#a0a0a0;">Live Theme Preview</div>
+              </div>
+            </div>
+            <div style="display:flex; gap:8px; flex-wrap:wrap;">
+              <div id="preview-btn-cta" style="padding:6px 14px; border-radius:6px; font-size:0.78rem; font-weight:600; background:#c9a84c; color:#080808;">Explore Catalog</div>
+              <div id="preview-btn-wa" style="padding:6px 14px; border-radius:6px; font-size:0.78rem; font-weight:600; background:#25d366; color:#ffffff; display:flex; align-items:center; gap:5px;"><i class="fab fa-whatsapp"></i> WhatsApp</div>
+            </div>
+          </div>
+
+          <!-- COLOR PICKERS GRID -->
+          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:20px; margin-bottom:28px;">
+
+            <div>
+              <label style="display:block; font-size:0.82rem; font-weight:600; margin-bottom:6px; color:var(--text-muted);">🎨 Background Color</label>
+              <div style="display:flex; align-items:center; gap:10px;">
+                <input type="color" id="tc-bg" value="#080808" oninput="updateThemePreview()" style="width:44px; height:36px; border:none; border-radius:6px; cursor:pointer; padding:2px;">
+                <input type="text" id="tc-bg-hex" value="#080808" oninput="syncColorPicker('tc-bg','tc-bg-hex')" style="flex:1; padding:7px 10px; border-radius:6px; border:1px solid var(--border); background:var(--surface-2); color:var(--text-main); font-size:0.82rem;">
+              </div>
+            </div>
+
+            <div>
+              <label style="display:block; font-size:0.82rem; font-weight:600; margin-bottom:6px; color:var(--text-muted);">✨ Accent / Gold Color</label>
+              <div style="display:flex; align-items:center; gap:10px;">
+                <input type="color" id="tc-accent" value="#c9a84c" oninput="updateThemePreview()" style="width:44px; height:36px; border:none; border-radius:6px; cursor:pointer; padding:2px;">
+                <input type="text" id="tc-accent-hex" value="#c9a84c" oninput="syncColorPicker('tc-accent','tc-accent-hex')" style="flex:1; padding:7px 10px; border-radius:6px; border:1px solid var(--border); background:var(--surface-2); color:var(--text-main); font-size:0.82rem;">
+              </div>
+            </div>
+
+            <div>
+              <label style="display:block; font-size:0.82rem; font-weight:600; margin-bottom:6px; color:var(--text-muted);">🔤 Text / Font Color</label>
+              <div style="display:flex; align-items:center; gap:10px;">
+                <input type="color" id="tc-text" value="#f5f0e8" oninput="updateThemePreview()" style="width:44px; height:36px; border:none; border-radius:6px; cursor:pointer; padding:2px;">
+                <input type="text" id="tc-text-hex" value="#f5f0e8" oninput="syncColorPicker('tc-text','tc-text-hex')" style="flex:1; padding:7px 10px; border-radius:6px; border:1px solid var(--border); background:var(--surface-2); color:var(--text-main); font-size:0.82rem;">
+              </div>
+            </div>
+
+            <div>
+              <label style="display:block; font-size:0.82rem; font-weight:600; margin-bottom:6px; color:var(--text-muted);">🔘 CTA Button Color</label>
+              <div style="display:flex; align-items:center; gap:10px;">
+                <input type="color" id="tc-btn" value="#c9a84c" oninput="updateThemePreview()" style="width:44px; height:36px; border:none; border-radius:6px; cursor:pointer; padding:2px;">
+                <input type="text" id="tc-btn-hex" value="#c9a84c" oninput="syncColorPicker('tc-btn','tc-btn-hex')" style="flex:1; padding:7px 10px; border-radius:6px; border:1px solid var(--border); background:var(--surface-2); color:var(--text-main); font-size:0.82rem;">
+              </div>
+            </div>
+
+            <div>
+              <label style="display:block; font-size:0.82rem; font-weight:600; margin-bottom:6px; color:var(--text-muted);">📌 Navbar Background</label>
+              <div style="display:flex; align-items:center; gap:10px;">
+                <input type="color" id="tc-navbar" value="#121212" oninput="updateThemePreview()" style="width:44px; height:36px; border:none; border-radius:6px; cursor:pointer; padding:2px;">
+                <input type="text" id="tc-navbar-hex" value="#121212" oninput="syncColorPicker('tc-navbar','tc-navbar-hex')" style="flex:1; padding:7px 10px; border-radius:6px; border:1px solid var(--border); background:var(--surface-2); color:var(--text-main); font-size:0.82rem;">
+              </div>
+            </div>
+
+            <div>
+              <label style="display:block; font-size:0.82rem; font-weight:600; margin-bottom:6px; color:var(--text-muted);">💬 WhatsApp Btn Background</label>
+              <div style="display:flex; align-items:center; gap:10px;">
+                <input type="color" id="tc-wa-bg" value="#25d366" oninput="updateThemePreview()" style="width:44px; height:36px; border:none; border-radius:6px; cursor:pointer; padding:2px;">
+                <input type="text" id="tc-wa-bg-hex" value="#25d366" oninput="syncColorPicker('tc-wa-bg','tc-wa-bg-hex')" style="flex:1; padding:7px 10px; border-radius:6px; border:1px solid var(--border); background:var(--surface-2); color:var(--text-main); font-size:0.82rem;">
+              </div>
+            </div>
+
+            <div>
+              <label style="display:block; font-size:0.82rem; font-weight:600; margin-bottom:6px; color:var(--text-muted);">💬 WhatsApp Btn Text Color</label>
+              <div style="display:flex; align-items:center; gap:10px;">
+                <input type="color" id="tc-wa-text" value="#ffffff" oninput="updateThemePreview()" style="width:44px; height:36px; border:none; border-radius:6px; cursor:pointer; padding:2px;">
+                <input type="text" id="tc-wa-text-hex" value="#ffffff" oninput="syncColorPicker('tc-wa-text','tc-wa-text-hex')" style="flex:1; padding:7px 10px; border-radius:6px; border:1px solid var(--border); background:var(--surface-2); color:var(--text-main); font-size:0.82rem;">
+              </div>
+            </div>
+
+          </div>
+
+          <!-- SAVE BUTTON -->
+          <div style="display:flex; align-items:center; gap:15px; flex-wrap:wrap;">
+            <button onclick="saveThemeSettings()" class="btn btn-primary" style="min-width:200px;">
+              <i class="fas fa-save"></i> Save &amp; Apply to Live Website
+            </button>
+            <button onclick="resetThemeToDefault()" class="btn btn-secondary" style="font-size:0.85rem;">
+              <i class="fas fa-undo"></i> Reset to Default
+            </button>
+            <span id="theme-save-status" style="display:none; font-size:0.85rem; color:#4caf7d;"></span>
+          </div>
+        </div>
+      </section>
+
       <!-- SECTION 6: BULK CSV IMPORT -->
       <section id="bulk" class="admin-section" style="display:none;">
         <div class="table-card" style="max-width:720px;">
@@ -622,8 +732,8 @@ Gold Necklace,necklaces,gold,22K,30,3000,"Bridal necklace, hand finished",https:
   </div>
 
   <!-- SCRIPTS -->
-  <script src="js/config.js?v=1.1.9"></script>
-  <script src="js/api.js?v=1.1.9"></script>
-  <script src="js/admin-main.js?v=1.1.9"></script>
+  <script src="js/config.js?v=1.2.0"></script>
+  <script src="js/api.js?v=1.2.0"></script>
+  <script src="js/admin-main.js?v=1.2.0"></script>
 </body>
 </html>

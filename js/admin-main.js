@@ -161,6 +161,7 @@ function initAdminDashboard() {
   renderAppointmentsTable();
   initBulkCSVImport();
   initNotificationForm();
+  initThemeSection();
   initNavigationTabs();
 
   // Background Auto-Refresh every 15 seconds for live enquiries, custom orders, appointments & visitor count
@@ -191,6 +192,10 @@ function initNavigationTabs() {
           sec.style.display = 'none';
         }
       });
+
+      if (targetId === 'theme') {
+        initThemeSection();
+      }
     });
   });
 }
@@ -1245,3 +1250,138 @@ function rejectAppointment(id, name, phone, date, time) {
   const waUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`;
   window.open(waUrl, '_blank');
 }
+
+// ─── SITE THEME CUSTOMIZER ─────────────────────────────────────────────────────
+
+// Keep color picker and hex text input in sync
+function syncColorPicker(pickerId, hexId) {
+  const hexInput = document.getElementById(hexId);
+  const picker = document.getElementById(pickerId);
+  if (!hexInput || !picker) return;
+  const val = hexInput.value.trim();
+  if (/^#[0-9A-Fa-f]{6}$/.test(val)) {
+    picker.value = val;
+    updateThemePreview();
+  }
+}
+
+// Update the live preview bar
+function updateThemePreview() {
+  const bg      = document.getElementById('tc-bg')?.value      || '#080808';
+  const accent  = document.getElementById('tc-accent')?.value  || '#c9a84c';
+  const text    = document.getElementById('tc-text')?.value    || '#f5f0e8';
+  const btnBg   = document.getElementById('tc-btn')?.value     || '#c9a84c';
+  const waBg    = document.getElementById('tc-wa-bg')?.value   || '#25d366';
+  const waText  = document.getElementById('tc-wa-text')?.value || '#ffffff';
+
+  // Sync hex inputs
+  const fields = ['bg','accent','text','btn','navbar','wa-bg','wa-text'];
+  fields.forEach(f => {
+    const p = document.getElementById('tc-' + f);
+    const h = document.getElementById('tc-' + f + '-hex');
+    if (p && h) h.value = p.value;
+  });
+
+  const bar     = document.getElementById('theme-preview-bar');
+  const brand   = document.getElementById('preview-brand');
+  const btnCta  = document.getElementById('preview-btn-cta');
+  const btnWa   = document.getElementById('preview-btn-wa');
+  if (bar)    { bar.style.background = bg; bar.style.borderColor = accent; }
+  if (brand)  { brand.style.color = accent; }
+  if (btnCta) { btnCta.style.background = btnBg; btnCta.style.color = bg; }
+  if (btnWa)  { btnWa.style.background = waBg; btnWa.style.color = waText; }
+}
+
+// Apply a preset theme to the color pickers
+const THEME_PRESETS = {
+  dark_gold:      { bg:'#080808', accent:'#c9a84c', text:'#f5f0e8', btn:'#c9a84c', navbar:'#121212', waBg:'#25d366', waText:'#ffffff' },
+  ivory_light:    { bg:'#faf6f0', accent:'#b8860b', text:'#2c1a00', btn:'#b8860b', navbar:'#f0e8d8', waBg:'#25d366', waText:'#ffffff' },
+  midnight_blue:  { bg:'#0a0f1e', accent:'#4a90d9', text:'#e8f0ff', btn:'#4a90d9', navbar:'#0d1b3e', waBg:'#4a90d9', waText:'#ffffff' },
+  rose_gold:      { bg:'#1a0a0f', accent:'#b76e79', text:'#f5e8ea', btn:'#b76e79', navbar:'#2a1018', waBg:'#b76e79', waText:'#ffffff' }
+};
+
+function applyPresetTheme(name) {
+  const p = THEME_PRESETS[name];
+  if (!p) return;
+  const setVal = (id, val) => {
+    const el = document.getElementById(id);
+    if (el) el.value = val;
+  };
+  setVal('tc-bg', p.bg);       setVal('tc-bg-hex', p.bg);
+  setVal('tc-accent', p.accent); setVal('tc-accent-hex', p.accent);
+  setVal('tc-text', p.text);   setVal('tc-text-hex', p.text);
+  setVal('tc-btn', p.btn);     setVal('tc-btn-hex', p.btn);
+  setVal('tc-navbar', p.navbar); setVal('tc-navbar-hex', p.navbar);
+  setVal('tc-wa-bg', p.waBg);  setVal('tc-wa-bg-hex', p.waBg);
+  setVal('tc-wa-text', p.waText); setVal('tc-wa-text-hex', p.waText);
+  updateThemePreview();
+}
+
+// Save theme settings to Google Sheets via updateSettings action
+async function saveThemeSettings() {
+  const statusEl = document.getElementById('theme-save-status');
+  const btn = document.querySelector('[onclick="saveThemeSettings()"]');
+  if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...'; }
+  if (statusEl) { statusEl.style.display = 'none'; }
+
+  const getVal = id => document.getElementById(id)?.value || '';
+  const theme = {
+    theme_bg:        getVal('tc-bg'),
+    theme_accent:    getVal('tc-accent'),
+    theme_text:      getVal('tc-text'),
+    theme_btn_bg:    getVal('tc-btn'),
+    theme_navbar_bg: getVal('tc-navbar'),
+    theme_wa_bg:     getVal('tc-wa-bg'),
+    theme_wa_text:   getVal('tc-wa-text'),
+    last_settings_update: new Date().toISOString()
+  };
+
+  try {
+    if (CONFIG.APPS_SCRIPT_URL) {
+      const params = new URLSearchParams({ action: 'updateSettings' });
+      Object.entries(theme).forEach(([k, v]) => params.append(`data[${k}]`, v));
+      await fetch(`${CONFIG.APPS_SCRIPT_URL}?${params.toString()}`);
+    }
+    if (statusEl) {
+      statusEl.textContent = '✅ Theme saved! Live website will update within 10 seconds.';
+      statusEl.style.display = 'inline';
+      statusEl.style.color = '#4caf7d';
+    }
+  } catch(err) {
+    if (statusEl) {
+      statusEl.textContent = '❌ Save failed: ' + err.message;
+      statusEl.style.display = 'inline';
+      statusEl.style.color = '#e05252';
+    }
+  }
+
+  if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fas fa-save"></i> Save & Apply to Live Website'; }
+}
+
+// Reset all colors to dark gold defaults
+function resetThemeToDefault() {
+  applyPresetTheme('dark_gold');
+}
+
+// Load current saved theme values into pickers when section is opened
+function initThemeSection() {
+  if (CONFIG.APPS_SCRIPT_URL) {
+    fetch(`${CONFIG.APPS_SCRIPT_URL}?action=getSettings&_nc=${Date.now()}`)
+      .then(r => r.json())
+      .then(json => {
+        if (json.status === 'success' && json.data) {
+          const d = json.data;
+          const setVal = (id, val) => { if (val && document.getElementById(id)) document.getElementById(id).value = val; };
+          setVal('tc-bg',       d.theme_bg);       setVal('tc-bg-hex',       d.theme_bg);
+          setVal('tc-accent',   d.theme_accent);   setVal('tc-accent-hex',   d.theme_accent);
+          setVal('tc-text',     d.theme_text);     setVal('tc-text-hex',     d.theme_text);
+          setVal('tc-btn',      d.theme_btn_bg);   setVal('tc-btn-hex',      d.theme_btn_bg);
+          setVal('tc-navbar',   d.theme_navbar_bg);setVal('tc-navbar-hex',   d.theme_navbar_bg);
+          setVal('tc-wa-bg',    d.theme_wa_bg);    setVal('tc-wa-bg-hex',    d.theme_wa_bg);
+          setVal('tc-wa-text',  d.theme_wa_text);  setVal('tc-wa-text-hex',  d.theme_wa_text);
+          updateThemePreview();
+        }
+      }).catch(() => {});
+  }
+}
+
