@@ -583,10 +583,10 @@
           </div>
 
           <!-- COLOR PICKERS GRID -->
-          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:20px; margin-bottom:28px;">
+          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:20px; margin-bottom:28px;">
 
             <div>
-              <label style="display:block; font-size:0.82rem; font-weight:600; margin-bottom:6px; color:var(--text-muted);">🎨 Background Color</label>
+              <label style="display:block; font-size:0.82rem; font-weight:600; margin-bottom:6px; color:var(--text-muted);">🎨 Page Background</label>
               <div style="display:flex; align-items:center; gap:10px;">
                 <input type="color" id="tc-bg" value="#080808" oninput="updateThemePreview()" style="width:44px; height:36px; border:none; border-radius:6px; cursor:pointer; padding:2px;">
                 <input type="text" id="tc-bg-hex" value="#080808" oninput="syncColorPicker('tc-bg','tc-bg-hex')" style="flex:1; padding:7px 10px; border-radius:6px; border:1px solid var(--border); background:var(--surface-2); color:var(--text-main); font-size:0.82rem;">
@@ -594,26 +594,10 @@
             </div>
 
             <div>
-              <label style="display:block; font-size:0.82rem; font-weight:600; margin-bottom:6px; color:var(--text-muted);">✨ Accent / Gold Color</label>
+              <label style="display:block; font-size:0.82rem; font-weight:600; margin-bottom:6px; color:var(--text-muted);">📦 Card / Surface Background</label>
               <div style="display:flex; align-items:center; gap:10px;">
-                <input type="color" id="tc-accent" value="#c9a84c" oninput="updateThemePreview()" style="width:44px; height:36px; border:none; border-radius:6px; cursor:pointer; padding:2px;">
-                <input type="text" id="tc-accent-hex" value="#c9a84c" oninput="syncColorPicker('tc-accent','tc-accent-hex')" style="flex:1; padding:7px 10px; border-radius:6px; border:1px solid var(--border); background:var(--surface-2); color:var(--text-main); font-size:0.82rem;">
-              </div>
-            </div>
-
-            <div>
-              <label style="display:block; font-size:0.82rem; font-weight:600; margin-bottom:6px; color:var(--text-muted);">🔤 Text / Font Color</label>
-              <div style="display:flex; align-items:center; gap:10px;">
-                <input type="color" id="tc-text" value="#f5f0e8" oninput="updateThemePreview()" style="width:44px; height:36px; border:none; border-radius:6px; cursor:pointer; padding:2px;">
-                <input type="text" id="tc-text-hex" value="#f5f0e8" oninput="syncColorPicker('tc-text','tc-text-hex')" style="flex:1; padding:7px 10px; border-radius:6px; border:1px solid var(--border); background:var(--surface-2); color:var(--text-main); font-size:0.82rem;">
-              </div>
-            </div>
-
-            <div>
-              <label style="display:block; font-size:0.82rem; font-weight:600; margin-bottom:6px; color:var(--text-muted);">🔘 CTA Button Color</label>
-              <div style="display:flex; align-items:center; gap:10px;">
-                <input type="color" id="tc-btn" value="#c9a84c" oninput="updateThemePreview()" style="width:44px; height:36px; border:none; border-radius:6px; cursor:pointer; padding:2px;">
-                <input type="text" id="tc-btn-hex" value="#c9a84c" oninput="syncColorPicker('tc-btn','tc-btn-hex')" style="flex:1; padding:7px 10px; border-radius:6px; border:1px solid var(--border); background:var(--surface-2); color:var(--text-main); font-size:0.82rem;">
+                <input type="color" id="tc-surface" value="#111111" oninput="updateThemePreview()" style="width:44px; height:36px; border:none; border-radius:6px; cursor:pointer; padding:2px;">
+                <input type="text" id="tc-surface-hex" value="#111111" oninput="syncColorPicker('tc-surface','tc-surface-hex')" style="flex:1; padding:7px 10px; border-radius:6px; border:1px solid var(--border); background:var(--surface-2); color:var(--text-main); font-size:0.82rem;">
               </div>
             </div>
 
@@ -626,7 +610,47 @@
             </div>
 
             <div>
-              <label style="display:block; font-size:0.82rem; font-weight:600; margin-bottom:6px; color:var(--text-muted);">💬 WhatsApp Btn Background</label>
+              <label style="display:block; font-size:0.82rem; font-weight:600; margin-bottom:6px; color:var(--text-muted);">✨ Accent / Gold Color</label>
+              <div style="display:flex; align-items:center; gap:10px;">
+                <input type="color" id="tc-accent" value="#c9a84c" oninput="updateThemePreview()" style="width:44px; height:36px; border:none; border-radius:6px; cursor:pointer; padding:2px;">
+                <input type="text" id="tc-accent-hex" value="#c9a84c" oninput="syncColorPicker('tc-accent','tc-accent-hex')" style="flex:1; padding:7px 10px; border-radius:6px; border:1px solid var(--border); background:var(--surface-2); color:var(--text-main); font-size:0.82rem;">
+              </div>
+            </div>
+
+            <div>
+              <label style="display:block; font-size:0.82rem; font-weight:600; margin-bottom:6px; color:var(--text-muted);">🔤 Main Text Color</label>
+              <div style="display:flex; align-items:center; gap:10px;">
+                <input type="color" id="tc-text" value="#f5f0e8" oninput="updateThemePreview()" style="width:44px; height:36px; border:none; border-radius:6px; cursor:pointer; padding:2px;">
+                <input type="text" id="tc-text-hex" value="#f5f0e8" oninput="syncColorPicker('tc-text','tc-text-hex')" style="flex:1; padding:7px 10px; border-radius:6px; border:1px solid var(--border); background:var(--surface-2); color:var(--text-main); font-size:0.82rem;">
+              </div>
+            </div>
+
+            <div>
+              <label style="display:block; font-size:0.82rem; font-weight:600; margin-bottom:6px; color:var(--text-muted);">🏷️ Secondary / Muted Text</label>
+              <div style="display:flex; align-items:center; gap:10px;">
+                <input type="color" id="tc-muted" value="#a0a0a0" oninput="updateThemePreview()" style="width:44px; height:36px; border:none; border-radius:6px; cursor:pointer; padding:2px;">
+                <input type="text" id="tc-muted-hex" value="#a0a0a0" oninput="syncColorPicker('tc-muted','tc-muted-hex')" style="flex:1; padding:7px 10px; border-radius:6px; border:1px solid var(--border); background:var(--surface-2); color:var(--text-main); font-size:0.82rem;">
+              </div>
+            </div>
+
+            <div>
+              <label style="display:block; font-size:0.82rem; font-weight:600; margin-bottom:6px; color:var(--text-muted);">🔘 Primary CTA Button Color</label>
+              <div style="display:flex; align-items:center; gap:10px;">
+                <input type="color" id="tc-btn" value="#c9a84c" oninput="updateThemePreview()" style="width:44px; height:36px; border:none; border-radius:6px; cursor:pointer; padding:2px;">
+                <input type="text" id="tc-btn-hex" value="#c9a84c" oninput="syncColorPicker('tc-btn','tc-btn-hex')" style="flex:1; padding:7px 10px; border-radius:6px; border:1px solid var(--border); background:var(--surface-2); color:var(--text-main); font-size:0.82rem;">
+              </div>
+            </div>
+
+            <div>
+              <label style="display:block; font-size:0.82rem; font-weight:600; margin-bottom:6px; color:var(--text-muted);">⚪ Secondary Outline Button</label>
+              <div style="display:flex; align-items:center; gap:10px;">
+                <input type="color" id="tc-btn-sec" value="#c9a84c" oninput="updateThemePreview()" style="width:44px; height:36px; border:none; border-radius:6px; cursor:pointer; padding:2px;">
+                <input type="text" id="tc-btn-sec-hex" value="#c9a84c" oninput="syncColorPicker('tc-btn-sec','tc-btn-sec-hex')" style="flex:1; padding:7px 10px; border-radius:6px; border:1px solid var(--border); background:var(--surface-2); color:var(--text-main); font-size:0.82rem;">
+              </div>
+            </div>
+
+            <div>
+              <label style="display:block; font-size:0.82rem; font-weight:600; margin-bottom:6px; color:var(--text-muted);">💬 WhatsApp / Enquire Btn Bg</label>
               <div style="display:flex; align-items:center; gap:10px;">
                 <input type="color" id="tc-wa-bg" value="#25d366" oninput="updateThemePreview()" style="width:44px; height:36px; border:none; border-radius:6px; cursor:pointer; padding:2px;">
                 <input type="text" id="tc-wa-bg-hex" value="#25d366" oninput="syncColorPicker('tc-wa-bg','tc-wa-bg-hex')" style="flex:1; padding:7px 10px; border-radius:6px; border:1px solid var(--border); background:var(--surface-2); color:var(--text-main); font-size:0.82rem;">
@@ -634,10 +658,34 @@
             </div>
 
             <div>
-              <label style="display:block; font-size:0.82rem; font-weight:600; margin-bottom:6px; color:var(--text-muted);">💬 WhatsApp Btn Text Color</label>
+              <label style="display:block; font-size:0.82rem; font-weight:600; margin-bottom:6px; color:var(--text-muted);">💬 WhatsApp / Enquire Btn Text</label>
               <div style="display:flex; align-items:center; gap:10px;">
                 <input type="color" id="tc-wa-text" value="#ffffff" oninput="updateThemePreview()" style="width:44px; height:36px; border:none; border-radius:6px; cursor:pointer; padding:2px;">
                 <input type="text" id="tc-wa-text-hex" value="#ffffff" oninput="syncColorPicker('tc-wa-text','tc-wa-text-hex')" style="flex:1; padding:7px 10px; border-radius:6px; border:1px solid var(--border); background:var(--surface-2); color:var(--text-main); font-size:0.82rem;">
+              </div>
+            </div>
+
+            <div>
+              <label style="display:block; font-size:0.82rem; font-weight:600; margin-bottom:6px; color:var(--text-muted);">📊 Live Rate Ticker Background</label>
+              <div style="display:flex; align-items:center; gap:10px;">
+                <input type="color" id="tc-ticker-bg" value="#111111" oninput="updateThemePreview()" style="width:44px; height:36px; border:none; border-radius:6px; cursor:pointer; padding:2px;">
+                <input type="text" id="tc-ticker-bg-hex" value="#111111" oninput="syncColorPicker('tc-ticker-bg','tc-ticker-bg-hex')" style="flex:1; padding:7px 10px; border-radius:6px; border:1px solid var(--border); background:var(--surface-2); color:var(--text-main); font-size:0.82rem;">
+              </div>
+            </div>
+
+            <div>
+              <label style="display:block; font-size:0.82rem; font-weight:600; margin-bottom:6px; color:var(--text-muted);">📢 Promo Offer Banner Bg</label>
+              <div style="display:flex; align-items:center; gap:10px;">
+                <input type="color" id="tc-promo-bg" value="#c9a84c" oninput="updateThemePreview()" style="width:44px; height:36px; border:none; border-radius:6px; cursor:pointer; padding:2px;">
+                <input type="text" id="tc-promo-bg-hex" value="#c9a84c" oninput="syncColorPicker('tc-promo-bg','tc-promo-bg-hex')" style="flex:1; padding:7px 10px; border-radius:6px; border:1px solid var(--border); background:var(--surface-2); color:var(--text-main); font-size:0.82rem;">
+              </div>
+            </div>
+
+            <div>
+              <label style="display:block; font-size:0.82rem; font-weight:600; margin-bottom:6px; color:var(--text-muted);">📢 Promo Offer Banner Text</label>
+              <div style="display:flex; align-items:center; gap:10px;">
+                <input type="color" id="tc-promo-text" value="#080808" oninput="updateThemePreview()" style="width:44px; height:36px; border:none; border-radius:6px; cursor:pointer; padding:2px;">
+                <input type="text" id="tc-promo-text-hex" value="#080808" oninput="syncColorPicker('tc-promo-text','tc-promo-text-hex')" style="flex:1; padding:7px 10px; border-radius:6px; border:1px solid var(--border); background:var(--surface-2); color:var(--text-main); font-size:0.82rem;">
               </div>
             </div>
 
@@ -732,8 +780,8 @@ Gold Necklace,necklaces,gold,22K,30,3000,"Bridal necklace, hand finished",https:
   </div>
 
   <!-- SCRIPTS -->
-  <script src="js/config.js?v=1.2.1"></script>
-  <script src="js/api.js?v=1.2.1"></script>
-  <script src="js/admin-main.js?v=1.2.1"></script>
+  <script src="js/config.js?v=1.3.0"></script>
+  <script src="js/api.js?v=1.3.0"></script>
+  <script src="js/admin-main.js?v=1.3.0"></script>
 </body>
 </html>
