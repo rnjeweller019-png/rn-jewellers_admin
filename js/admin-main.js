@@ -1265,15 +1265,24 @@ function syncColorPicker(pickerId, hexId) {
   }
 }
 
-// Update the live preview bar
+// Update the live preview bar & sample storefront window
 function updateThemePreview() {
-  const bg      = document.getElementById('tc-bg')?.value      || '#080808';
-  const surface = document.getElementById('tc-surface')?.value || '#111111';
-  const accent  = document.getElementById('tc-accent')?.value  || '#c9a84c';
-  const text    = document.getElementById('tc-text')?.value    || '#f5f0e8';
-  const btnBg   = document.getElementById('tc-btn')?.value     || '#c9a84c';
-  const waBg    = document.getElementById('tc-wa-bg')?.value   || '#25d366';
-  const waText  = document.getElementById('tc-wa-text')?.value || '#ffffff';
+  const getV = id => document.getElementById(id)?.value || '';
+
+  const bg        = getV('tc-bg')         || '#080808';
+  const surface   = getV('tc-surface')    || '#111111';
+  const accent    = getV('tc-accent')     || '#c9a84c';
+  const text      = getV('tc-text')       || '#f5f0e8';
+  const muted     = getV('tc-muted')      || '#a0a0a0';
+  const btnBg     = getV('tc-btn')        || '#c9a84c';
+  const btnSec    = getV('tc-btn-sec')    || '#c9a84c';
+  const navbar    = getV('tc-navbar')     || 'rgba(18,18,18,0.75)';
+  const tickerBg  = getV('tc-ticker-bg')  || '#111111';
+  const tickerTxt = getV('tc-ticker-text')|| '#f5d77f';
+  const promoBg   = getV('tc-promo-bg')   || '#c9a84c';
+  const promoTxt  = getV('tc-promo-text') || '#080808';
+  const waBg      = getV('tc-wa-bg')      || '#25d366';
+  const waText    = getV('tc-wa-text')    || '#ffffff';
 
   // Sync hex inputs
   const fields = ['bg','surface','accent','text','muted','btn','btn-sec','navbar','ticker-bg','ticker-text','promo-bg','promo-text','wa-bg','wa-text'];
@@ -1283,14 +1292,57 @@ function updateThemePreview() {
     if (p && h) h.value = p.value;
   });
 
-  const bar     = document.getElementById('theme-preview-bar');
-  const brand   = document.getElementById('preview-brand');
-  const btnCta  = document.getElementById('preview-btn-cta');
-  const btnWa   = document.getElementById('preview-btn-wa');
-  if (bar)    { bar.style.background = surface || bg; bar.style.borderColor = accent; }
-  if (brand)  { brand.style.color = accent; }
-  if (btnCta) { btnCta.style.background = btnBg; btnCta.style.color = bg; }
-  if (btnWa)  { btnWa.style.background = waBg; btnWa.style.color = waText; }
+  // 1. Ticker
+  const prevTicker = document.getElementById('prev-ticker');
+  if (prevTicker) { prevTicker.style.background = tickerBg; prevTicker.style.color = tickerTxt; }
+
+  // 2. Navbar
+  const prevNavbar = document.getElementById('prev-navbar');
+  const prevBrand  = document.getElementById('prev-brand-title');
+  const prevNavLnk = document.getElementById('prev-nav-links');
+  if (prevNavbar) { prevNavbar.style.background = navbar; }
+  if (prevBrand)  { prevBrand.style.color = accent; }
+  if (prevNavLnk) { prevNavLnk.style.color = text; }
+
+  // 3. Promo Banner
+  const prevPromo = document.getElementById('prev-promo');
+  if (prevPromo) { prevPromo.style.background = promoBg; prevPromo.style.color = promoTxt; }
+
+  // 4. Hero Content & Body
+  const prevBody     = document.getElementById('prev-body');
+  const prevSub      = document.getElementById('prev-subtitle');
+  const prevHeroDesc = document.getElementById('prev-hero-desc');
+  const prevHeroHl   = document.getElementById('prev-hero-highlight');
+  const prevBtnPri   = document.getElementById('prev-btn-primary');
+  const prevBtnSec   = document.getElementById('prev-btn-secondary');
+
+  if (prevBody)     { prevBody.style.background = bg; prevBody.style.color = text; }
+  if (prevSub)      { prevSub.style.color = accent; }
+  if (prevHeroDesc) { prevHeroDesc.style.color = muted; }
+  if (prevHeroHl)   { prevHeroHl.style.color = accent; }
+  if (prevBtnPri)   { prevBtnPri.style.background = btnBg; prevBtnPri.style.color = bg; }
+  if (prevBtnSec)   { prevBtnSec.style.borderColor = btnSec; prevBtnSec.style.color = btnSec; }
+
+  // 5. Product Card Mockup
+  const prevCard       = document.getElementById('prev-card');
+  const prevCardCat    = document.getElementById('prev-card-cat');
+  const prevCardTitle  = document.getElementById('prev-card-title');
+  const prevCardMeta   = document.getElementById('prev-card-meta');
+  const prevCardPrice  = document.getElementById('prev-card-price');
+  const prevCardBtnSec = document.getElementById('prev-card-btn-sec');
+  const prevCardBtnWa  = document.getElementById('prev-card-btn-wa');
+
+  if (prevCard)       { prevCard.style.background = surface; prevCard.style.borderColor = accent; }
+  if (prevCardCat)    { prevCardCat.style.color = accent; }
+  if (prevCardTitle)  { prevCardTitle.style.color = text; }
+  if (prevCardMeta)   { prevCardMeta.style.color = muted; }
+  if (prevCardPrice)  { prevCardPrice.style.color = accent; }
+  if (prevCardBtnSec) { prevCardBtnSec.style.borderColor = btnSec; prevCardBtnSec.style.color = btnSec; }
+  if (prevCardBtnWa)  { prevCardBtnWa.style.background = waBg; prevCardBtnWa.style.color = waText; }
+
+  // 6. Floating WhatsApp Mockup
+  const prevFloatWa = document.getElementById('prev-floating-wa');
+  if (prevFloatWa) { prevFloatWa.style.background = waBg; prevFloatWa.style.color = waText; }
 }
 
 // Apply a preset theme to the color pickers
