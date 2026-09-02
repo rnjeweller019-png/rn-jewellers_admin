@@ -1284,8 +1284,14 @@ function updateThemePreview() {
   const waBg      = getV('tc-wa-bg')      || '#25d366';
   const waText    = getV('tc-wa-text')    || '#ffffff';
 
+  // Hero overrides
+  const heroSub   = getV('tc-hero-sub')   || accent;
+  const heroTitle = getV('tc-hero-title') || text;
+  const heroHl    = getV('tc-hero-hl')    || accent;
+  const heroDesc  = getV('tc-hero-desc')  || muted;
+
   // Sync hex inputs
-  const fields = ['bg','surface','accent','text','muted','btn','btn-sec','navbar','ticker-bg','ticker-text','promo-bg','promo-text','wa-bg','wa-text'];
+  const fields = ['bg','surface','accent','text','muted','btn','btn-sec','navbar','ticker-bg','ticker-text','promo-bg','promo-text','wa-bg','wa-text','hero-sub','hero-title','hero-hl','hero-desc'];
   fields.forEach(f => {
     const p = document.getElementById('tc-' + f);
     const h = document.getElementById('tc-' + f + '-hex');
@@ -1312,16 +1318,18 @@ function updateThemePreview() {
   const prevBody     = document.getElementById('prev-body');
   const prevSub      = document.getElementById('prev-subtitle');
   const prevHeroDesc = document.getElementById('prev-hero-desc');
+  const prevHeroTitle= document.getElementById('prev-hero-title');
   const prevHeroHl   = document.getElementById('prev-hero-highlight');
   const prevBtnPri   = document.getElementById('prev-btn-primary');
   const prevBtnSec   = document.getElementById('prev-btn-secondary');
 
-  if (prevBody)     { prevBody.style.background = bg; prevBody.style.color = text; }
-  if (prevSub)      { prevSub.style.color = accent; }
-  if (prevHeroDesc) { prevHeroDesc.style.color = muted; }
-  if (prevHeroHl)   { prevHeroHl.style.color = accent; }
-  if (prevBtnPri)   { prevBtnPri.style.background = btnBg; prevBtnPri.style.color = bg; }
-  if (prevBtnSec)   { prevBtnSec.style.borderColor = btnSec; prevBtnSec.style.color = btnSec; }
+  if (prevBody)      { prevBody.style.background = bg; prevBody.style.color = text; }
+  if (prevSub)       { prevSub.style.color = heroSub; }
+  if (prevHeroTitle) { prevHeroTitle.style.color = heroTitle; }
+  if (prevHeroHl)    { prevHeroHl.style.color = heroHl; }
+  if (prevHeroDesc)  { prevHeroDesc.style.color = heroDesc; }
+  if (prevBtnPri)    { prevBtnPri.style.background = btnBg; prevBtnPri.style.color = bg; }
+  if (prevBtnSec)    { prevBtnSec.style.borderColor = btnSec; prevBtnSec.style.color = btnSec; }
 
   // 5. Product Card Mockup
   const prevCard       = document.getElementById('prev-card');
@@ -1347,10 +1355,10 @@ function updateThemePreview() {
 
 // Apply a preset theme to the color pickers
 const THEME_PRESETS = {
-  dark_gold:      { bg:'#080808', surface:'#111111', accent:'#c9a84c', text:'#f5f0e8', muted:'#a0a0a0', btn:'#c9a84c', btnSec:'#c9a84c', navbar:'#121212', tickerBg:'#111111', tickerText:'#f5d77f', promoBg:'#c9a84c', promoText:'#080808', waBg:'#25d366', waText:'#ffffff' },
-  ivory_light:    { bg:'#faf6f0', surface:'#ffffff', accent:'#b8860b', text:'#2c1a00', muted:'#665544', btn:'#b8860b', btnSec:'#b8860b', navbar:'#f0e8d8', tickerBg:'#2c1a00', tickerText:'#f5d77f', promoBg:'#b8860b', promoText:'#ffffff', waBg:'#25d366', waText:'#ffffff' },
-  midnight_blue:  { bg:'#0a0f1e', surface:'#111a30', accent:'#4a90d9', text:'#e8f0ff', muted:'#8da2c4', btn:'#4a90d9', btnSec:'#4a90d9', navbar:'#0d1b3e', tickerBg:'#050810', tickerText:'#4a90d9', promoBg:'#4a90d9', promoText:'#0a0f1e', waBg:'#458ad3', waText:'#ffffff' },
-  rose_gold:      { bg:'#1a0a0f', surface:'#261218', accent:'#b76e79', text:'#f5e8ea', muted:'#b09096', btn:'#b76e79', btnSec:'#b76e79', navbar:'#2a1018', tickerBg:'#12070a', tickerText:'#b76e79', promoBg:'#b76e79', promoText:'#1a0a0f', waBg:'#b76e79', waText:'#ffffff' }
+  dark_gold:      { bg:'#080808', surface:'#111111', accent:'#c9a84c', text:'#f5f0e8', muted:'#a0a0a0', btn:'#c9a84c', btnSec:'#c9a84c', navbar:'#121212', tickerBg:'#111111', tickerText:'#f5d77f', promoBg:'#c9a84c', promoText:'#080808', waBg:'#25d366', waText:'#ffffff', heroSub:'#c9a84c', heroTitle:'#f5f0e8', heroHl:'#c9a84c', heroDesc:'#a0a0a0' },
+  ivory_light:    { bg:'#faf6f0', surface:'#ffffff', accent:'#b8860b', text:'#2c1a00', muted:'#665544', btn:'#b8860b', btnSec:'#b8860b', navbar:'#f0e8d8', tickerBg:'#2c1a00', tickerText:'#f5d77f', promoBg:'#b8860b', promoText:'#ffffff', waBg:'#25d366', waText:'#ffffff', heroSub:'#b8860b', heroTitle:'#2c1a00', heroHl:'#b8860b', heroDesc:'#665544' },
+  midnight_blue:  { bg:'#0a0f1e', surface:'#111a30', accent:'#4a90d9', text:'#e8f0ff', muted:'#8da2c4', btn:'#4a90d9', btnSec:'#4a90d9', navbar:'#0d1b3e', tickerBg:'#050810', tickerText:'#4a90d9', promoBg:'#4a90d9', promoText:'#0a0f1e', waBg:'#458ad3', waText:'#ffffff', heroSub:'#4a90d9', heroTitle:'#e8f0ff', heroHl:'#4a90d9', heroDesc:'#8da2c4' },
+  rose_gold:      { bg:'#1a0a0f', surface:'#261218', accent:'#b76e79', text:'#f5e8ea', muted:'#b09096', btn:'#b76e79', btnSec:'#b76e79', navbar:'#2a1018', tickerBg:'#12070a', tickerText:'#b76e79', promoBg:'#b76e79', promoText:'#1a0a0f', waBg:'#b76e79', waText:'#ffffff', heroSub:'#b76e79', heroTitle:'#f5e8ea', heroHl:'#b76e79', heroDesc:'#b09096' }
 };
 
 function applyPresetTheme(name) {
@@ -1374,6 +1382,10 @@ function applyPresetTheme(name) {
   setVal('tc-promo-text', p.promoText);setVal('tc-promo-text-hex', p.promoText);
   setVal('tc-wa-bg', p.waBg);          setVal('tc-wa-bg-hex', p.waBg);
   setVal('tc-wa-text', p.waText);      setVal('tc-wa-text-hex', p.waText);
+  setVal('tc-hero-sub', p.heroSub);    setVal('tc-hero-sub-hex', p.heroSub);
+  setVal('tc-hero-title', p.heroTitle);setVal('tc-hero-title-hex', p.heroTitle);
+  setVal('tc-hero-hl', p.heroHl);      setVal('tc-hero-hl-hex', p.heroHl);
+  setVal('tc-hero-desc', p.heroDesc);  setVal('tc-hero-desc-hex', p.heroDesc);
   updateThemePreview();
 }
 
@@ -1400,6 +1412,10 @@ async function saveThemeSettings() {
     theme_promo_text:    getVal('tc-promo-text'),
     theme_wa_bg:         getVal('tc-wa-bg'),
     theme_wa_text:       getVal('tc-wa-text'),
+    theme_hero_sub:      getVal('tc-hero-sub'),
+    theme_hero_title:    getVal('tc-hero-title'),
+    theme_hero_hl:       getVal('tc-hero-hl'),
+    theme_hero_desc:     getVal('tc-hero-desc'),
     last_settings_update: new Date().toISOString()
   };
 
@@ -1453,6 +1469,10 @@ function initThemeSection() {
           setVal('tc-promo-text',   d.theme_promo_text);   setVal('tc-promo-text-hex',   d.theme_promo_text);
           setVal('tc-wa-bg',        d.theme_wa_bg);        setVal('tc-wa-bg-hex',        d.theme_wa_bg);
           setVal('tc-wa-text',      d.theme_wa_text);      setVal('tc-wa-text-hex',      d.theme_wa_text);
+          setVal('tc-hero-sub',     d.theme_hero_sub);     setVal('tc-hero-sub-hex',     d.theme_hero_sub);
+          setVal('tc-hero-title',   d.theme_hero_title);   setVal('tc-hero-title-hex',   d.theme_hero_title);
+          setVal('tc-hero-hl',      d.theme_hero_hl);      setVal('tc-hero-hl-hex',      d.theme_hero_hl);
+          setVal('tc-hero-desc',    d.theme_hero_desc);    setVal('tc-hero-desc-hex',    d.theme_hero_desc);
           updateThemePreview();
         }
       }).catch(() => {});
