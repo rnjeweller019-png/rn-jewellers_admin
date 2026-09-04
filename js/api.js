@@ -35,15 +35,27 @@ const API = {
     localStorage.setItem('rnj_site_settings', JSON.stringify(updated));
 
     if (CONFIG.APPS_SCRIPT_URL) {
+      const data = {
+        promo_banner_text: updated.promo_banner_text,
+        show_promo_banner: updated.show_promo_banner ? '1' : '0',
+        hero_bg_url: updated.hero_bg_url,
+        enable_particles: updated.enable_particles ? '1' : '0',
+        last_settings_update: updated.last_updated
+      };
+      // Include any theme fields if provided
+      const themeKeys = [
+        'theme_bg', 'theme_surface_bg', 'theme_accent', 'theme_text', 'theme_muted_text',
+        'theme_btn_bg', 'theme_btn_sec_border', 'theme_navbar_bg', 'theme_ticker_bg',
+        'theme_ticker_text', 'theme_promo_bg', 'theme_promo_text', 'theme_wa_bg',
+        'theme_wa_text', 'theme_hero_sub', 'theme_hero_title', 'theme_hero_hl', 'theme_hero_desc'
+      ];
+      themeKeys.forEach(k => {
+        if (updated[k] !== undefined) data[k] = updated[k];
+      });
+
       const payload = {
         action: 'updateSettings',
-        data: {
-          promo_banner_text: updated.promo_banner_text,
-          show_promo_banner: updated.show_promo_banner ? '1' : '0',
-          hero_bg_url: updated.hero_bg_url,
-          enable_particles: updated.enable_particles ? '1' : '0',
-          last_settings_update: updated.last_updated
-        }
+        data: data
       };
 
       fetch(CONFIG.APPS_SCRIPT_URL, {
@@ -54,7 +66,6 @@ const API = {
       .then(r => r.json())
       .then(r => console.log('Site settings saved to Sheets:', r.message))
       .catch(err => {
-        // Fallback: If POST fails, strip heavy hero_bg_url if base64 and fire GET query
         const cleanData = { ...payload.data };
         if (cleanData.hero_bg_url && cleanData.hero_bg_url.startsWith('data:image')) {
           cleanData.hero_bg_url = 'assets/images/hero.jpg';
@@ -167,7 +178,26 @@ const API = {
               promo_banner_text: (setJson.data.promo_banner_text && String(setJson.data.promo_banner_text).trim() !== '') ? setJson.data.promo_banner_text : defaultText,
               show_promo_banner: parseBool(setJson.data.show_promo_banner, currentSettings.show_promo_banner !== false),
               hero_bg_url: (setJson.data.hero_bg_url && String(setJson.data.hero_bg_url).trim() !== '') ? setJson.data.hero_bg_url : "assets/images/hero.jpg",
-              enable_particles: parseBool(setJson.data.enable_particles, currentSettings.enable_particles !== false)
+              enable_particles: parseBool(setJson.data.enable_particles, currentSettings.enable_particles !== false),
+              // Theme colors
+              theme_bg:           setJson.data.theme_bg           || currentSettings.theme_bg           || '#080808',
+              theme_surface_bg:   setJson.data.theme_surface_bg   || currentSettings.theme_surface_bg   || '',
+              theme_accent:       setJson.data.theme_accent       || currentSettings.theme_accent       || '#c9a84c',
+              theme_text:         setJson.data.theme_text         || currentSettings.theme_text         || '#f5f0e8',
+              theme_muted_text:   setJson.data.theme_muted_text   || currentSettings.theme_muted_text   || '',
+              theme_btn_bg:       setJson.data.theme_btn_bg       || currentSettings.theme_btn_bg       || '#c9a84c',
+              theme_btn_sec_border:setJson.data.theme_btn_sec_border|| currentSettings.theme_btn_sec_border|| '',
+              theme_navbar_bg:    setJson.data.theme_navbar_bg    || currentSettings.theme_navbar_bg    || 'rgba(18,18,18,0.75)',
+              theme_ticker_bg:    setJson.data.theme_ticker_bg    || currentSettings.theme_ticker_bg    || '',
+              theme_ticker_text:  setJson.data.theme_ticker_text  || currentSettings.theme_ticker_text  || '',
+              theme_promo_bg:     setJson.data.theme_promo_bg     || currentSettings.theme_promo_bg     || '',
+              theme_promo_text:   setJson.data.theme_promo_text   || currentSettings.theme_promo_text   || '',
+              theme_wa_bg:        setJson.data.theme_wa_bg        || currentSettings.theme_wa_bg        || '#25d366',
+              theme_wa_text:      setJson.data.theme_wa_text      || currentSettings.theme_wa_text      || '#ffffff',
+              theme_hero_sub:     setJson.data.theme_hero_sub     || currentSettings.theme_hero_sub     || '',
+              theme_hero_title:   setJson.data.theme_hero_title   || currentSettings.theme_hero_title   || '',
+              theme_hero_hl:      setJson.data.theme_hero_hl      || currentSettings.theme_hero_hl      || '',
+              theme_hero_desc:    setJson.data.theme_hero_desc    || currentSettings.theme_hero_desc    || ''
             };
             localStorage.setItem('rnj_site_settings', JSON.stringify(siteSettings));
           }
