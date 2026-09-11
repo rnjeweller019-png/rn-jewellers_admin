@@ -322,9 +322,23 @@
                 <input type="text" id="admin-p-image" class="form-control" placeholder="assets/images/ring_1.jpg or Google Drive URL">
                 <button type="button" onclick="fetchDriveImagesPicker()" class="btn btn-secondary" style="white-space:nowrap;"><i class="fas fa-folder-open"></i> 📷 Choose from Drive</button>
               </div>
-              <div id="drive-picker-container" style="display:none; margin-top:10px; padding:12px; background:rgba(201,168,76,0.05); border:1px solid var(--border-gold); border-radius:8px; max-height:220px; overflow-y:auto;">
-                <span style="font-size:0.8rem; color:var(--gold-light); display:block; margin-bottom:8px;"><i class="fas fa-images"></i> Select an image from your Google Drive folder:</span>
-                <div id="drive-picker-grid" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(75px, 1fr)); gap:10px;"></div>
+              <div id="drive-picker-container" style="display:none; margin-top:12px; padding:14px; background:rgba(18,18,18,0.95); border:1px solid var(--border-gold); border-radius:10px; box-shadow:0 10px 25px rgba(0,0,0,0.5);">
+                <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:12px; padding-bottom:10px; border-bottom:1px solid rgba(201,168,76,0.2);">
+                  <span id="drive-picker-title" style="font-size:0.85rem; font-weight:600; color:var(--gold-light); display:flex; align-items:center; gap:6px;">
+                    <i class="fas fa-images"></i> Google Drive Library (<span id="drive-img-count" style="color:#fff;">0</span>)
+                  </span>
+                  <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+                    <input type="text" id="drive-img-search" placeholder="🔍 Search by name..." oninput="filterDriveImages()" style="padding:5px 10px; font-size:0.75rem; background:#000; border:1px solid var(--border-gold); border-radius:5px; color:#fff; width:150px; outline:none;">
+                    <select id="drive-img-sort" onchange="sortDriveImages()" style="padding:5px 8px; font-size:0.75rem; background:#000; border:1px solid var(--border-gold); border-radius:5px; color:var(--gold-light); outline:none; cursor:pointer;">
+                      <option value="newest">🕒 Newest First</option>
+                      <option value="oldest">⏳ Oldest First</option>
+                      <option value="name_asc">🔤 Name (A-Z)</option>
+                      <option value="name_desc">🔤 Name (Z-A)</option>
+                    </select>
+                    <button type="button" onclick="document.getElementById('drive-picker-container').style.display='none'" style="background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.2); border-radius:4px; color:#fff; cursor:pointer; padding:4px 8px; font-size:0.8rem;" title="Close">✕</button>
+                  </div>
+                </div>
+                <div id="drive-picker-grid" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(95px, 1fr)); gap:12px; max-height:280px; overflow-y:auto; padding-right:4px;"></div>
               </div>
             </div>
 

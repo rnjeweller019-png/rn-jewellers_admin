@@ -993,9 +993,13 @@ function exportEnquiriesCSV() {
 }
 
 // GOOGLE DRIVE IMAGE PICKER AUTOMATION
+let cachedDriveImages = [];
+
 function fetchDriveImagesPicker() {
   const container = document.getElementById('drive-picker-container');
   const grid = document.getElementById('drive-picker-grid');
+  const countEl = document.getElementById('drive-img-count');
+  const searchInput = document.getElementById('drive-img-search');
   if (!container || !grid) return;
 
   if (!CONFIG.APPS_SCRIPT_URL) {
@@ -1003,26 +1007,113 @@ function fetchDriveImagesPicker() {
     return;
   }
 
-  grid.innerHTML = '<span style="color:var(--text-muted); font-size:0.8rem;">Scanning images in your Google Drive folder...</span>';
   container.style.display = 'block';
+  if (searchInput) searchInput.value = '';
 
-  fetch(`${CONFIG.APPS_SCRIPT_URL}?action=getDriveImages`)
+  // If already cached in this session, render immediately and fetch fresh in background
+  if (cachedDriveImages.length > 0) {
+    renderDriveImagesGrid(getProcessedDriveImages());
+  } else {
+    grid.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:20px; color:var(--gold-light); font-size:0.85rem;"><i class="fas fa-spinner fa-spin" style="margin-right:8px;"></i>Scanning & sorting images from Google Drive...</div>';
+  }
+
+  fetch(`${CONFIG.APPS_SCRIPT_URL}?action=getDriveImages&_t=${Date.now()}`)
     .then(res => res.json())
     .then(res => {
-      if (res.status === 'success' && Array.isArray(res.images) && res.images.length > 0) {
-        grid.innerHTML = res.images.map(img => `
-          <div onclick="selectDriveImage('${img.url}')" style="cursor:pointer; border:1px solid var(--border-gold); border-radius:6px; overflow:hidden; text-align:center; background:#000; padding:4px;">
-            <img src="${img.url}" style="width:100%; height:60px; object-fit:cover; border-radius:4px;" alt="${img.name}">
-            <span style="font-size:0.65rem; color:var(--text-muted); display:block; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="${img.name}">${img.name}</span>
-          </div>
-        `).join('');
+      if (res.status === 'success' && Array.isArray(res.images)) {
+        cachedDriveImages = res.images;
+        if (countEl) countEl.innerText = res.images.length;
+        renderDriveImagesGrid(getProcessedDriveImages());
       } else {
-        grid.innerHTML = `<span style="color:var(--error); font-size:0.8rem;">${res.message || 'No images found in Drive folder. Check GOOGLE_DRIVE_FOLDER_ID in Code.gs.'}</span>`;
+        if (cachedDriveImages.length === 0) {
+          grid.innerHTML = `<div style="grid-column:1/-1; color:var(--error); font-size:0.8rem; padding:10px;">${res.message || 'No images found in Drive folder. Check GOOGLE_DRIVE_FOLDER_ID in Code.gs.'}</div>`;
+        }
       }
     })
     .catch(err => {
-      grid.innerHTML = '<span style="color:var(--error); font-size:0.8rem;">Failed to fetch Drive images. Make sure GOOGLE_DRIVE_FOLDER_ID is set in Code.gs.</span>';
+      if (cachedDriveImages.length === 0) {
+        grid.innerHTML = '<div style="grid-column:1/-1; color:var(--error); font-size:0.8rem; padding:10px;">Failed to fetch Drive images. Make sure GOOGLE_DRIVE_FOLDER_ID is set in Code.gs.</div>';
+      }
     });
+}
+
+function formatDriveDateBadge(timestamp) {
+  if (!timestamp) return '';
+  const date = new Date(timestamp);
+  if (isNaN(date.getTime())) return '';
+  const now = new Date();
+  const diffMs = now - date;
+  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+  if (diffDays === 0) return '<span style="color:#4ade80; font-weight:600;">Today</span>';
+  if (diffDays === 1) return '<span style="color:#a3e635;">Yesterday</span>';
+  if (diffDays < 7) return `<span style="color:#fbbf24;">${diffDays}d ago</span>`;
+  return `<span style="color:var(--text-muted);">${date.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}</span>`;
+}
+
+function getProcessedDriveImages() {
+  const searchVal = (document.getElementById('drive-img-search')?.value || '').toLowerCase().trim();
+  const sortVal = document.getElementById('drive-img-sort')?.value || 'newest';
+
+  let list = [...cachedDriveImages];
+
+  // Filter
+  if (searchVal) {
+    list = list.filter(img => (img.name || '').toLowerCase().includes(searchVal));
+  }
+
+  // Sort
+  if (sortVal === 'newest') {
+    list.sort((a, b) => (b.created || b.updated || 0) - (a.created || a.updated || 0));
+  } else if (sortVal === 'oldest') {
+    list.sort((a, b) => (a.created || a.updated || 0) - (b.created || b.updated || 0));
+  } else if (sortVal === 'name_asc') {
+    list.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+  } else if (sortVal === 'name_desc') {
+    list.sort((a, b) => (b.name || '').localeCompare(a.name || ''));
+  }
+
+  return list;
+}
+
+function renderDriveImagesGrid(images) {
+  const grid = document.getElementById('drive-picker-grid');
+  const countEl = document.getElementById('drive-img-count');
+  if (!grid) return;
+
+  if (countEl && cachedDriveImages.length > 0) {
+    countEl.innerText = `${images.length}/${cachedDriveImages.length}`;
+  }
+
+  if (!images || images.length === 0) {
+    grid.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:15px; color:var(--text-muted); font-size:0.8rem;">No matching images found.</div>';
+    return;
+  }
+
+  grid.innerHTML = images.map(img => {
+    const dateBadge = formatDriveDateBadge(img.created || img.updated);
+    return `
+      <div onclick="selectDriveImage('${img.url}')" 
+           title="${img.name}" 
+           style="cursor:pointer; border:1px solid var(--border-gold); border-radius:6px; overflow:hidden; text-align:center; background:#0a0a0a; padding:5px; transition:transform 0.15s ease, border-color 0.15s ease;"
+           onmouseover="this.style.borderColor='var(--gold-primary)'; this.style.transform='scale(1.03)';"
+           onmouseout="this.style.borderColor='var(--border-gold)'; this.style.transform='scale(1)';"
+      >
+        <div style="width:100%; height:65px; background:#000; border-radius:4px; overflow:hidden; display:flex; align-items:center; justify-content:center;">
+          <img src="${img.url}" loading="lazy" style="width:100%; height:100%; object-fit:cover;" alt="${img.name}">
+        </div>
+        <span style="font-size:0.65rem; color:#fff; display:block; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-top:4px; font-weight:500;">${img.name}</span>
+        <div style="font-size:0.6rem; margin-top:2px;">${dateBadge}</div>
+      </div>
+    `;
+  }).join('');
+}
+
+function filterDriveImages() {
+  renderDriveImagesGrid(getProcessedDriveImages());
+}
+
+function sortDriveImages() {
+  renderDriveImagesGrid(getProcessedDriveImages());
 }
 
 function selectDriveImage(url) {
